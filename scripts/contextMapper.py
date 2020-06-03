@@ -32,7 +32,7 @@ for line in sys.stdin:
             cs, context = '',''
 
         # print
-        print(f'{task}\t{clean_info(context)}\t{clean_info(cs)}\t{clean_info(ts)}')
+        print(f'{task}\t{context}\t{cs}\t{ts}')
         
 #         print(20*'=')
 #         print('CONTEXT', clean_info(context))
