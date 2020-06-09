@@ -1,6 +1,6 @@
 The link to the original github is: https://github.com/rohithreddy024/Text-Summarizer-Pytorch
 
-##What to do##
+**What to do**
 
 Make sure your data is in .txt form and that the summary is in a different file than the entire sentence. Each line should be a new datapoint.
 
