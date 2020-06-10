@@ -7,3 +7,6 @@ __pycache__/
 
 # Misc
 .DS_Store
+
+# Gigaword/model data
+LSTM_Summarizer/data
