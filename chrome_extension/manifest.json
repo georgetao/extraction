@@ -1,14 +1,14 @@
 {
   "manifest_version": 2,
   "name": "ExtrAction Test",
-  "version": "0.1"
-}
-
-"content_scripts": [
-  {
-    "matches": [
-      "<all_urls>"
-    ],
-    "js": ["content.js"]
-  }
-]
+  "version": "0.1",
+  "description": "Trying to build an Extension!",
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"  // Can make this for specific urls.
+        ],
+      "js": ["content.js"]
+    }
+  ]
+ }
