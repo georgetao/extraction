@@ -6,11 +6,27 @@
           height: 30px;
           width: 30px;
           outline: none;
+          font-size: 8px;
         }
+
       </style>
     </head>
     <body>
-      <button id="changeColor"></button>
+      <p>
+          <label>Text Area</label>
+          <textarea id = "myTextArea"
+                  rows = "3"
+                  cols = "80">Your text here!</textarea>
+        </p>
+      <p>
+          <label>List Appears Here</label>
+          <textarea id = "myTextArea"
+                  rows = "3"
+                  cols = "80">Your text here!</textarea>
+        </p>
+
+      <button class="btn_change" id="changeColor"></button>
+      <button class="btn_reset" id="reset"></button> <!-- Creates a second button that resets the original document background color (transparent) -->
       <script src="popup.js"></script>
     </body>
   </html>
