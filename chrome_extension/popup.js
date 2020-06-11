@@ -1,5 +1,6 @@
 let changeColor = document.getElementById('changeColor');
 let reset = document.getElementById('reset');
+console.log(reset);
 
 chrome.storage.sync.get('color', function(data) {
     changeColor.style.backgroundColor = data.color;
