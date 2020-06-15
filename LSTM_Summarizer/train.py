@@ -252,7 +252,7 @@ class Train(object):
                 print("iter:", iter, "mle_loss:", "%.3f" % mle_avg, "reward:", "%.4f" % r_avg)
                 count = mle_total = r_total = 0
 
-            if iter % 10 == 0:
+            if iter % 50 == 0:
                 self.save_model(iter)
 
 
