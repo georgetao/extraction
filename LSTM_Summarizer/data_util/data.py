@@ -20,7 +20,7 @@ STOP_DECODING = '[STOP]' # This has a vocab id, which is used at the end of untr
 
 class Vocab(object):
 
-  def __init__(self, vocab_file, max_size):
+  def __init__(self, words, max_size=0):
     self._word_to_id = {}
     self._id_to_word = {}
     self._count = 0 # keeps track of total number of words in the Vocab
@@ -32,25 +32,45 @@ class Vocab(object):
       self._count += 1
 
     # Read the vocab file and add words up to max_size
+    for w in words:
+      if w in [SENTENCE_START, SENTENCE_END, UNKNOWN_TOKEN, PAD_TOKEN, START_DECODING, STOP_DECODING]:
+        raise Exception('<s>, </s>, [UNK], [PAD], [START] and [STOP] shouldn\'t be in the vocab file, but %s is' % w)
+      if w in self._word_to_id:
+        raise Exception('Duplicated word in vocabulary file: %s' % w)
+      self._word_to_id[w] = self._count
+      self._id_to_word[self._count] = w
+      self._count += 1
+      if max_size != 0 and self._count >= max_size:
+        print("max_size of vocab was specified as %i; we now have %i words. Stopping reading." % (max_size, self._count))
+        break
+    print("Finished constructing vocabulary of %i total words. Last word added: %s" % (self._count, self._id_to_word[self._count-1]))
+
+
+  @classmethod  
+  def from_vocab_file(cls, vocab_file, max_size=0):
+    count = 0 
+    words = set()
+    # Read the vocab file and add words up to max_size
     with open(vocab_file, 'r') as vocab_f:
       for line in vocab_f:
         pieces = line.split()
         if len(pieces) != 2:
-          # print ('Warning: incorrectly formatted line in vocabulary file: %s\n' % line)
+          print('Warning: incorrectly formatted line in vocabulary file: %s\n' % line)
           continue
         w = pieces[0]
         if w in [SENTENCE_START, SENTENCE_END, UNKNOWN_TOKEN, PAD_TOKEN, START_DECODING, STOP_DECODING]:
           raise Exception('<s>, </s>, [UNK], [PAD], [START] and [STOP] shouldn\'t be in the vocab file, but %s is' % w)
-        if w in self._word_to_id:
+        if w in words:
           raise Exception('Duplicated word in vocabulary file: %s' % w)
-        self._word_to_id[w] = self._count
-        self._id_to_word[self._count] = w
-        self._count += 1
-        if max_size != 0 and self._count >= max_size:
-          # print ("max_size of vocab was specified as %i; we now have %i words. Stopping reading." % (max_size, self._count))
+        words.add(w)
+        count += 1
+        if max_size != 0 and count >= max_size:
+          print("max_size of vocab was specified as %i; we now have %i words. Stopping reading." % (max_size, count))
           break
 
-    # print ("Finished constructing vocabulary of %i total words. Last word added: %s" % (self._count, self._id_to_word[self._count-1]))
+    # create and return Vocab
+    vocab = cls(words, max_size)
+    return vocab
 
   def word2id(self, word):
     if word not in self._word_to_id:
@@ -66,32 +86,49 @@ class Vocab(object):
     return self._count
 
   def write_metadata(self, fpath):
-    print ("Writing word embedding metadata file to %s..." % (fpath))
+    print("Writing word embedding metadata file to %s..." % (fpath))
     with open(fpath, "w") as f:
       fieldnames = ['word']
       writer = csv.DictWriter(f, delimiter="\t", fieldnames=fieldnames)
-      for i in xrange(self.size()):
+      for i in range(self.size()):
         writer.writerow({"word": self._id_to_word[i]})
 
 
-def example_generator(data_path, single_pass):
+# def example_generator(data_path, single_pass):
+#   while True:
+#     filelist = glob.glob(data_path) # get the list of datafiles
+#     assert filelist, ('Error: Empty filelist at %s' % data_path) # check filelist isn't empty
+#     if single_pass:
+#       filelist = sorted(filelist)
+#     else:
+#       random.shuffle(filelist)
+#     for f in filelist:
+#       reader = open(f, 'rb')
+#       while True:
+#         len_bytes = reader.read(8)
+#         if not len_bytes: break # finished reading this file
+#         str_len = struct.unpack('q', len_bytes)[0]
+#         example_str = struct.unpack('%ds' % str_len, reader.read(str_len))[0]
+#         yield example_pb2.Example.FromString(example_str)
+#     if single_pass:
+#       print("example_generator completed reading all datafiles. No more data.")
+#       break
+
+# custom example_generator for this project
+
+def example_generator(example_list, single_pass):
+  assert example_list, ('Error: Empty example list') # check examples exist
   while True:
-    filelist = glob.glob(data_path) # get the list of datafiles
-    assert filelist, ('Error: Empty filelist at %s' % data_path) # check filelist isn't empty
+    for example in example_list:
+      try:
+        x, y = example
+        yield x, y
+      except ValueError:
+        print('Not a tuple of size 2, instead: ', example)
+        pass
+
     if single_pass:
-      filelist = sorted(filelist)
-    else:
-      random.shuffle(filelist)
-    for f in filelist:
-      reader = open(f, 'rb')
-      while True:
-        len_bytes = reader.read(8)
-        if not len_bytes: break # finished reading this file
-        str_len = struct.unpack('q', len_bytes)[0]
-        example_str = struct.unpack('%ds' % str_len, reader.read(str_len))[0]
-        yield example_pb2.Example.FromString(example_str)
-    if single_pass:
-      # print ("example_generator completed reading all datafiles. No more data.")
+      print("example_generator completed reading all examples. No more data.")
       break
 
 
@@ -137,7 +174,7 @@ def outputids2words(id_list, vocab, article_oovs):
       article_oov_idx = i - vocab.size()
       try:
         w = article_oovs[article_oov_idx]
-      except ValueError as e: # i doesn't correspond to an article oov
+      except: # except ValueError as e: # i doesn't correspond to an article oov
         raise ValueError('Error: model produced word ID %i which corresponds to article OOV %i but this example only has %i article OOVs' % (i, article_oov_idx, len(article_oovs)))
     words.append(w)
   return words

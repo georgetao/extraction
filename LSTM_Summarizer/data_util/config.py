@@ -1,7 +1,10 @@
+
+log_root = "/Users/rowancassius/Desktop/capstone/LSTM_Summarizer/"
+
 train_data_path = 	"data/chunked/train/train_*"
 valid_data_path = 	"data/chunked/valid/valid_*"
-test_data_path = 	"data/chunked/test/test_*"
-vocab_path = 		"data/vocab"
+test_data_path  = 	"data/chunked/test/test_*"
+vocab_path      = 		"data/vocab"
 
 
 # Hyperparameters

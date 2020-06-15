@@ -149,8 +149,8 @@ class Batch(object):
 class Batcher(object):
   BATCH_QUEUE_MAX = 1000 # max number of batches the batch_queue can hold
 
-  def __init__(self, data_path, vocab, mode, batch_size, single_pass):
-    self._data_path = data_path
+  def __init__(self, examples, vocab, mode, batch_size, single_pass):
+    self._examples = examples
     self._vocab = vocab
     self._single_pass = single_pass
     self.mode = mode
@@ -192,7 +192,8 @@ class Batcher(object):
     # If the batch queue is empty, print a warning
     if self._batch_queue.qsize() == 0:
       # tf.compat.v1.logging.warning('Bucket input queue is empty when calling next_batch. Bucket queue size: %i, Input queue size: %i', self._batch_queue.qsize(), self._example_queue.qsize())
-      if self._single_pass and self._finished_reading:
+      # if self._single_pass and self._finished_reading:
+      if self._single_pass:
         tf.compat.v1.logging.info("Finished reading dataset in single_pass mode.")
         return None
 
@@ -200,7 +201,7 @@ class Batcher(object):
     return batch
 
   def fill_example_queue(self):
-    input_gen = self.text_generator(data.example_generator(self._data_path, self._single_pass))
+    input_gen = self.text_generator(data.example_generator(self._examples, self._single_pass))
     while True:
       try:
         (article, abstract) = next(input_gen) # read the next example from file. article and abstract are both strings.
@@ -271,10 +272,9 @@ class Batcher(object):
     while True:
       e = next(example_generator) # e is a tf.Example
       try:
-        article_text = e.features.feature['article'].bytes_list.value[0] # the article text was saved under the key 'article' in the data files
-        abstract_text = e.features.feature['abstract'].bytes_list.value[0] # the abstract text was saved under the key 'abstract' in the data files
-        article_text = article_text.decode()
-        abstract_text = abstract_text.decode()    
+        article_text, abstract_text = e
+        # article_text = article_text.decode()
+        # abstract_text = abstract_text.decode()    
       except ValueError:
         tf.compat.v1.logging.error('Failed to get article or abstract from example')
         continue
