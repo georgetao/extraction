@@ -68,10 +68,7 @@ class Evaluate(object):
 
             for i in range(len(pred_ids)):
                 decoded_words = data.outputids2words(pred_ids[i], self.vocab, batch.art_oovs[i])
-                if len(decoded_words) < 2:
-                    decoded_words = "xxx"
-                else:
-                    decoded_words = " ".join(decoded_words)
+                decoded_words = " ".join(decoded_words)
                 decoded_sents.append(decoded_words)
                 abstract = batch.original_abstracts[i]
                 article = batch.original_articles[i]
@@ -85,9 +82,9 @@ class Evaluate(object):
         # if print_sents:
         #     self.print_original_predicted(decoded_sents, ref_sents, article_sents, load_file)
 
-        scores = rouge.get_scores(decoded_sents, ref_sents, avg = True)
+        # scores = rouge.get_scores(decoded_sents, ref_sents, avg = True)
         
-        return decoded_sents, ref_sents, scores
+        return decoded_sents, ref_sents  # , scores
 
 
 if __name__ == "__main__":

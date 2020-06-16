@@ -42,8 +42,8 @@ class Train(object):
         }, save_path)
         print('model saved at: \n', save_path)
 
-    def setup_train(self):
-        self.model = Model()
+    def setup_train(self, model):
+        self.model = model()
         self.model = get_cuda(self.model)
         self.trainer = T.optim.Adam(self.model.parameters(), lr=config.lr)
         start_iter = 0
@@ -80,13 +80,24 @@ class Train(object):
             use_gound_truth = get_cuda((T.rand(len(enc_out)) > 0.25)).long()                        #Probabilities indicating whether to use ground truth labels instead of previous decoded tokens
             x_t = use_gound_truth * dec_batch[:, t] + (1 - use_gound_truth) * x_t                   #Select decoder input based on use_ground_truth probabilities
             x_t = self.model.embeds(x_t)
-            final_dist, s_t, ct_e, sum_temporal_srcs, prev_s = self.model.decoder(x_t, s_t, enc_out, enc_padding_mask, ct_e, extra_zeros, enc_batch_extend_vocab, sum_temporal_srcs, prev_s)
+            x_t = x_t.squeeze()
+            final_dist, s_t, ct_e, sum_temporal_srcs, prev_s = self.model.decoder(
+                x_t, 
+                s_t, 
+                enc_out, 
+                enc_padding_mask, 
+                ct_e, 
+                extra_zeros, 
+                enc_batch_extend_vocab, 
+                sum_temporal_srcs, 
+                prev_s
+            )
             target = target_batch[:, t]
             log_probs = T.log(final_dist + config.eps)
             step_loss = F.nll_loss(log_probs, target, reduction="none", ignore_index=self.pad_id)
             step_losses.append(step_loss)
             x_t = T.multinomial(final_dist, 1).squeeze()                                            #Sample words from final distribution which can be used as input in next time step
-            is_oov = (x_t >= config.vocab_size).long()                                              #Mask indicating whether sampled word is OOV
+            is_oov = (x_t >= self.vocab.size()).long()                                              #Mask indicating whether sampled word is OOV
             x_t = (1 - is_oov) * x_t.detach() + (is_oov) * self.unk_id                              #Replace OOVs with [UNK] token
 
         losses = T.sum(T.stack(step_losses, 1), 1)                                                  #unnormalized losses for each example in the batch; (batch_size)
@@ -191,6 +202,43 @@ class Train(object):
     #             f.write("Sample_R: %.4f, Baseline_R: %.4f\n\n"%(sample_r[i].item(), baseline_r[i].item()))
 
 
+    def train_one_batch_bert(self, batch, iter):
+        enc_batch, enc_lens, enc_padding_mask, enc_batch_extend_vocab, extra_zeros, context = get_enc_data(batch)
+        enc_out, enc_hidden = self.model.encoder(enc_batch, enc_lens)
+
+        # -------------------------------Summarization-----------------------
+        if self.opt.train_mle == "yes":                                                             #perform MLE training
+            mle_loss = self.train_batch_MLE(enc_out, enc_hidden, enc_padding_mask, context, extra_zeros, enc_batch_extend_vocab, batch)
+        else:
+            mle_loss = get_cuda(T.FloatTensor([0]))
+        # --------------RL training-----------------------------------------------------
+        if self.opt.train_rl == "yes":                                                              #perform reinforcement learning training
+            # multinomial sampling
+            sample_sents, RL_log_probs = self.train_batch_RL(enc_out, enc_hidden, enc_padding_mask, context, extra_zeros, enc_batch_extend_vocab, batch.art_oovs, greedy=False)
+            with T.autograd.no_grad():
+                # greedy sampling
+                greedy_sents, _ = self.train_batch_RL(enc_out, enc_hidden, enc_padding_mask, context, extra_zeros, enc_batch_extend_vocab, batch.art_oovs, greedy=True)
+
+            sample_reward = self.reward_function(sample_sents, batch.original_abstracts)
+            baseline_reward = self.reward_function(greedy_sents, batch.original_abstracts)
+            # if iter%200 == 0:
+            #     self.write_to_file(sample_sents, greedy_sents, batch.original_abstracts, sample_reward, baseline_reward, iter)
+            rl_loss = -(sample_reward - baseline_reward) * RL_log_probs                             #Self-critic policy gradient training (eq 15 in https://arxiv.org/pdf/1705.04304.pdf)
+            rl_loss = T.mean(rl_loss)
+
+            batch_reward = T.mean(sample_reward).item()
+        else:
+            rl_loss = get_cuda(T.FloatTensor([0]))
+            batch_reward = 0
+
+    # ------------------------------------------------------------------------------------
+        self.trainer.zero_grad()
+        (self.opt.mle_weight * mle_loss + self.opt.rl_weight * rl_loss).backward()
+        self.trainer.step()
+
+        return mle_loss.item(), batch_reward
+
+
     def train_one_batch(self, batch, iter):
         enc_batch, enc_lens, enc_padding_mask, enc_batch_extend_vocab, extra_zeros, context = get_enc_data(batch)
 
@@ -229,10 +277,10 @@ class Train(object):
 
         return mle_loss.item(), batch_reward
 
-    def trainIters(self):
-        iter = self.setup_train()
+    def trainIters(self, n_iters, model):
+        iter = self.setup_train(model)
         count = mle_total = r_total = 0
-        while iter <= config.max_iterations:
+        while iter <= n_iters:
             print(iter)
             batch = self.batcher.next_batch()
             try:

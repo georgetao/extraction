@@ -5,6 +5,7 @@ import random
 import struct
 import csv
 from tensorflow.core.example import example_pb2
+from transformers import BertTokenizer
 
 # <s> and </s> are used in the data files to segment the abstracts into sentences. They don't receive vocab ids.
 SENTENCE_START = '<s>'
@@ -72,6 +73,7 @@ class Vocab(object):
     vocab = cls(words, max_size)
     return vocab
 
+
   def word2id(self, word):
     if word not in self._word_to_id:
       return self._word_to_id[UNKNOWN_TOKEN]
@@ -93,28 +95,22 @@ class Vocab(object):
       for i in range(self.size()):
         writer.writerow({"word": self._id_to_word[i]})
 
+class BertVocab(Vocab):
+  def __init__(self, bert_name):
+    self.tokenizer = BertTokenizer.from_pretrained(bert_name)
+        
+    # Update Special tokens
+    self.tokenizer.add_special_tokens({
+        'bos_token': START_DECODING,
+        'eos_token': STOP_DECODING,
+        'unk_token': UNKNOWN_TOKEN,
+        'pad_token': PAD_TOKEN
+    })
+    # initialize vocab maps
+    self._word_to_id = self.tokenizer.vocab
+    self._id_to_word = self.tokenizer.ids_to_tokens
+    self._count = self.tokenizer.vocab_size
 
-# def example_generator(data_path, single_pass):
-#   while True:
-#     filelist = glob.glob(data_path) # get the list of datafiles
-#     assert filelist, ('Error: Empty filelist at %s' % data_path) # check filelist isn't empty
-#     if single_pass:
-#       filelist = sorted(filelist)
-#     else:
-#       random.shuffle(filelist)
-#     for f in filelist:
-#       reader = open(f, 'rb')
-#       while True:
-#         len_bytes = reader.read(8)
-#         if not len_bytes: break # finished reading this file
-#         str_len = struct.unpack('q', len_bytes)[0]
-#         example_str = struct.unpack('%ds' % str_len, reader.read(str_len))[0]
-#         yield example_pb2.Example.FromString(example_str)
-#     if single_pass:
-#       print("example_generator completed reading all datafiles. No more data.")
-#       break
-
-# custom example_generator for this project
 
 def example_generator(example_list, single_pass):
   assert example_list, ('Error: Empty example list') # check examples exist
