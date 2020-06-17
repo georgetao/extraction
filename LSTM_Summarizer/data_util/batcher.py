@@ -183,10 +183,13 @@ class Batcher(object):
       self._batch_q_threads[-1].start()
 
     # Start a thread that watches the other threads and restarts them if they're dead
-    if not single_pass: # We don't want a watcher in single_pass mode because the threads shouldn't run forever
-      self._watch_thread = Thread(target=self.watch_threads)
-      self._watch_thread.daemon = True
-      self._watch_thread.start()
+
+    # No more watching threads temporarily
+
+    # if not single_pass: # We don't want a watcher in single_pass mode because the threads shouldn't run forever
+    #   self._watch_thread = Thread(target=self.watch_threads)
+    #   self._watch_thread.daemon = True
+    #   self._watch_thread.start()
 
   def next_batch(self):
     # If the batch queue is empty, print a warning

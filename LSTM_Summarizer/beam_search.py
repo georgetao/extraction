@@ -56,7 +56,7 @@ class Beam(object):
             self.prev_s = prev_s[beams_order]                           #(beam, t, n_hid); sorted
         self.tokens = self.tokens[beams_order]                          #(beam, t); sorted
         self.tokens = T.cat([self.tokens, best_words], dim=1)           #(beam, t+1); sorted
-
+        print(self.tokens)
         #End condition is when top-of-beam is EOS.
         if best_words[0][0] == self.end_id:
             self.done = True
