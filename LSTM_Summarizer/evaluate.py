@@ -27,8 +27,8 @@ class Evaluate(object):
         self.opt = opt
         time.sleep(5)
 
-    def setup_valid(self):
-        self.model = Model()
+    def setup_valid(self, model):
+        self.model = model()
         self.model = get_cuda(self.model)
         checkpoint = T.load(os.path.join(config.save_model_path, self.opt.load_model))
         self.model.load_state_dict(checkpoint["model_dict"])
@@ -43,9 +43,8 @@ class Evaluate(object):
                 f.write("ref: " + ref_sents[i] + "\n")
                 f.write("dec: " + decoded_sents[i] + "\n\n")
 
-    def evaluate_batch(self, print_sents = False):
-
-        self.setup_valid()
+    def evaluate_batch(self, model):
+        self.setup_valid(model)
         batch = self.batcher.next_batch()
         start_id = self.vocab.word2id(data.START_DECODING)
         end_id = self.vocab.word2id(data.STOP_DECODING)
@@ -64,7 +63,19 @@ class Evaluate(object):
             print('Summarizing Batch...')
             #-----------------------Summarization----------------------------------------------------
             with T.autograd.no_grad():
-                pred_ids = beam_search(enc_hidden, enc_out, enc_padding_mask, ct_e, extra_zeros, enc_batch_extend_vocab, self.model, start_id, end_id, unk_id)
+                pred_ids = beam_search(
+                    enc_hidden, 
+                    enc_out, 
+                    enc_padding_mask, 
+                    ct_e, 
+                    extra_zeros, 
+                    enc_batch_extend_vocab, 
+                    self.model, 
+                    start_id, 
+                    end_id, 
+                    unk_id,
+                    self.vocab.size()
+                )
 
             for i in range(len(pred_ids)):
                 decoded_words = data.outputids2words(pred_ids[i], self.vocab, batch.art_oovs[i])

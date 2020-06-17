@@ -202,43 +202,6 @@ class Train(object):
     #             f.write("Sample_R: %.4f, Baseline_R: %.4f\n\n"%(sample_r[i].item(), baseline_r[i].item()))
 
 
-    def train_one_batch_bert(self, batch, iter):
-        enc_batch, enc_lens, enc_padding_mask, enc_batch_extend_vocab, extra_zeros, context = get_enc_data(batch)
-        enc_out, enc_hidden = self.model.encoder(enc_batch, enc_lens)
-
-        # -------------------------------Summarization-----------------------
-        if self.opt.train_mle == "yes":                                                             #perform MLE training
-            mle_loss = self.train_batch_MLE(enc_out, enc_hidden, enc_padding_mask, context, extra_zeros, enc_batch_extend_vocab, batch)
-        else:
-            mle_loss = get_cuda(T.FloatTensor([0]))
-        # --------------RL training-----------------------------------------------------
-        if self.opt.train_rl == "yes":                                                              #perform reinforcement learning training
-            # multinomial sampling
-            sample_sents, RL_log_probs = self.train_batch_RL(enc_out, enc_hidden, enc_padding_mask, context, extra_zeros, enc_batch_extend_vocab, batch.art_oovs, greedy=False)
-            with T.autograd.no_grad():
-                # greedy sampling
-                greedy_sents, _ = self.train_batch_RL(enc_out, enc_hidden, enc_padding_mask, context, extra_zeros, enc_batch_extend_vocab, batch.art_oovs, greedy=True)
-
-            sample_reward = self.reward_function(sample_sents, batch.original_abstracts)
-            baseline_reward = self.reward_function(greedy_sents, batch.original_abstracts)
-            # if iter%200 == 0:
-            #     self.write_to_file(sample_sents, greedy_sents, batch.original_abstracts, sample_reward, baseline_reward, iter)
-            rl_loss = -(sample_reward - baseline_reward) * RL_log_probs                             #Self-critic policy gradient training (eq 15 in https://arxiv.org/pdf/1705.04304.pdf)
-            rl_loss = T.mean(rl_loss)
-
-            batch_reward = T.mean(sample_reward).item()
-        else:
-            rl_loss = get_cuda(T.FloatTensor([0]))
-            batch_reward = 0
-
-    # ------------------------------------------------------------------------------------
-        self.trainer.zero_grad()
-        (self.opt.mle_weight * mle_loss + self.opt.rl_weight * rl_loss).backward()
-        self.trainer.step()
-
-        return mle_loss.item(), batch_reward
-
-
     def train_one_batch(self, batch, iter):
         enc_batch, enc_lens, enc_padding_mask, enc_batch_extend_vocab, extra_zeros, context = get_enc_data(batch)
 
@@ -277,7 +240,7 @@ class Train(object):
 
         return mle_loss.item(), batch_reward
 
-    def trainIters(self, n_iters, model):
+    def trainIters(self, n_iters, model, report_every=5, save_every=50):
         iter = self.setup_train(model)
         count = mle_total = r_total = 0
         while iter <= n_iters:
@@ -294,13 +257,13 @@ class Train(object):
             count += 1
             iter += 1
 
-            if iter % 5 == 0:
+            if iter % report_every == 0:
                 mle_avg = mle_total / count
                 r_avg = r_total / count
                 print("iter:", iter, "mle_loss:", "%.3f" % mle_avg, "reward:", "%.4f" % r_avg)
                 count = mle_total = r_total = 0
 
-            if iter % 50 == 0:
+            if iter % save_every == 0:
                 self.save_model(iter)
 
 
