@@ -18,6 +18,15 @@ STOP_DECODING = '[STOP]' # This has a vocab id, which is used at the end of untr
 
 # Note: none of <s>, </s>, [PAD], [UNK], [START], [STOP] should appear in the vocab file.
 
+bert_name = 'bert-base-uncased'
+
+# Create the Bert Tokenizer
+bert_tokenizer = BertTokenizer.from_pretrained(bert_name)
+# Update 
+for u,t in zip(['[unused0]', '[unused1]'], [START_DECODING, STOP_DECODING]):
+    bert_tokenizer.vocab[t] = bert_tokenizer.vocab[u]
+    bert_tokenizer.vocab.pop(u)
+
 
 class Vocab(object):
 
@@ -96,17 +105,8 @@ class Vocab(object):
         writer.writerow({"word": self._id_to_word[i]})
 
 class BertVocab(Vocab):
-  def __init__(self, bert_name):
-    self.tokenizer = BertTokenizer.from_pretrained(bert_name)
-        
-    # Update Special tokens
-    self.tokenizer.add_special_tokens({
-        'bos_token': START_DECODING,
-        'eos_token': STOP_DECODING,
-        'unk_token': UNKNOWN_TOKEN,
-        'pad_token': PAD_TOKEN
-    })
-    # initialize vocab maps
+  def __init__(self):
+    self.tokenizer = bert_tokenizer
     self._word_to_id = self.tokenizer.vocab
     self._id_to_word = self.tokenizer.ids_to_tokens
     self._count = self.tokenizer.vocab_size

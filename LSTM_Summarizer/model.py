@@ -5,14 +5,12 @@ from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 
 from transformers import BertModel, BertConfig
 
-from data_util import config
 from train_util import get_cuda
+from data_util import config
+from data_util.data import bert_name, bert_tokenizer
 
-# bert name
-bert_name = 'bert-base-uncased'
 # bert config
 bert_config = BertConfig()
-# bert_config.vocab_size = 28996 # pretrained size
 bert_config.output_hidden_states = True
 
 
@@ -67,6 +65,7 @@ class BertEmbedder(nn.Module):
     def __init__(self):
         super(BertEmbedder, self).__init__()
         self.bert = BertModel.from_pretrained(bert_name, config=bert_config)
+        self.bert.resize_token_embeddings(len(bert_tokenizer))
         self.reduce = nn.Linear(bert_config.hidden_size, config.emb_dim)
         init_linear_wt(self.reduce)
 
