@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+<head>
+  <title>Request Classifier</title>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+  <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <h1>Request Classifier</h1>
+
+  <form action="{{ url_for('handle_data') }}" method="post">
+  	<input type="text" id="email_text" name="email_text" size="40" placeholder="Paste Text Here">
+  	<input type="submit">
+  </form>
+
+  <h2>Request Sentences</h2>
+  {{ r }}
+
+  <h2>Model Output</h2>
+  
+	  {% for i in range(0, len) %}
+		  <p>
+		  	{{ pred[i]["sentence"] }}
+		  </p>
+		  <p>
+		  	{{ pred[i]["label"]}}, {{pred[i]["certainty"]}}
+		  </p>
+	  <br>
+	  {%endfor%}
+	  
+  <!-- {{ pred }} -->
+  
+
+
+</body>
+</html>
