@@ -112,21 +112,28 @@ class BertVocab(Vocab):
     self._count = self.tokenizer.vocab_size
 
 
+# def example_generator(example_list, single_pass):
+#   assert example_list, ('Error: Empty example list') # check examples exist
+#   while True:
+#     for example in example_list:
+#       try:
+#         x, y = example
+#         yield x, y
+#       except ValueError:
+#         print('Not a tuple of size 2, instead: ', example)
+#         pass
+
+#     if single_pass:
+#       print("example_generator completed reading all examples. No more data.")
+#       break
+
 def example_generator(example_list, single_pass):
   assert example_list, ('Error: Empty example list') # check examples exist
   while True:
-    for example in example_list:
-      try:
-        x, y = example
-        yield x, y
-      except ValueError:
-        print('Not a tuple of size 2, instead: ', example)
-        pass
-
+    for example in example_list: yield example
     if single_pass:
       print("example_generator completed reading all examples. No more data.")
       break
-
 
 def article2ids(article_words, vocab):
   ids = []

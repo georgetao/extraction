@@ -8,6 +8,7 @@ from transformers import BertModel, BertConfig
 from train_util import get_cuda
 from data_util import config
 from data_util.data import bert_name, bert_tokenizer
+from data_util.batcher import SEGMENT
 
 # bert config
 bert_config = BertConfig()
@@ -103,6 +104,18 @@ class Encoder(nn.Module):
         h_reduced = F.relu(self.reduce_h(h))                        #bs,n_hid
         c_reduced = F.relu(self.reduce_c(c))
         return enc_out, (h_reduced, c_reduced)
+
+
+class TaskEncoder(Encoder):
+    def __init__(self):
+        super().__init__()
+
+        self.lstm = nn.LSTM(config.emb_dim * 2, config.hidden_dim, num_layers=1, batch_first=True, bidirectional=True)
+        init_lstm_wt(self.lstm)
+        self.reduce_h = nn.Linear(config.hidden_dim * 2, config.hidden_dim)
+        init_linear_wt(self.reduce_h)
+        self.reduce_c = nn.Linear(config.hidden_dim * 2, config.hidden_dim)
+        init_linear_wt(self.reduce_c)
 
 
 class PostBertEncoder(nn.Module):
@@ -214,7 +227,7 @@ class decoder_attention(nn.Module):
 
 
 class Decoder(nn.Module):
-    def __init__(self):
+    def __init__(self, vocab_size):
         super(Decoder, self).__init__()
         self.enc_attention = encoder_attention()
         self.dec_attention = decoder_attention()
@@ -227,7 +240,7 @@ class Decoder(nn.Module):
 
         #p_vocab
         self.V = nn.Linear(config.hidden_dim*4, config.hidden_dim)
-        self.V1 = nn.Linear(config.hidden_dim, config.vocab_size)
+        self.V1 = nn.Linear(config.hidden_dim, vocab_size)
         init_linear_wt(self.V1)
 
     def forward(self, x_t, s_t, enc_out, enc_padding_mask, ct_e, extra_zeros, enc_batch_extend_vocab, sum_temporal_srcs, prev_s):
@@ -261,16 +274,31 @@ class Decoder(nn.Module):
 
 
 class Model(nn.Module):
-    def __init__(self):
+    def __init__(self, vocab_size):
         super(Model, self).__init__()
         self.encoder = Encoder()
-        self.decoder = Decoder()
-        self.embeds = nn.Embedding(config.vocab_size, config.emb_dim)
+        self.decoder = Decoder(vocab_size)
+        self.embeds = nn.Embedding(vocab_size, config.emb_dim)
         init_wt_normal(self.embeds.weight)
 
         self.encoder = get_cuda(self.encoder)
         self.decoder = get_cuda(self.decoder)
         self.embeds = get_cuda(self.embeds)
+
+class TaskModel(nn.Module):
+    def __init__(self, vocab_size):
+        super(TaskModel, self).__init__()
+        self.encoder = TaskEncoder()
+        self.decoder = Decoder(vocab_size)
+        self.embeds = nn.Embedding(vocab_size, config.emb_dim)
+        self.seg_embeds = nn.Embedding(len(SEGMENT), config.emb_dim)
+        init_wt_normal(self.embeds.weight)
+        init_wt_normal(self.seg_embeds.weight)
+
+        self.encoder = get_cuda(self.encoder)
+        self.decoder = get_cuda(self.decoder)
+        self.embeds = get_cuda(self.embeds) 
+        self.seg_embeds = get_cuda(self.seg_embeds)
 
 class BertSumModel(nn.Module):
     def __init__(self):

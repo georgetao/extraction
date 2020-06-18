@@ -43,7 +43,7 @@ class Train(object):
         print('model saved at: \n', save_path)
 
     def setup_train(self, model):
-        self.model = model()
+        self.model = model(self.vocab.size())
         self.model = get_cuda(self.model)
         self.trainer = T.optim.Adam(self.model.parameters(), lr=config.lr)
         start_iter = 0
@@ -244,7 +244,7 @@ class Train(object):
         iter = self.setup_train(model)
         count = mle_total = r_total = 0
         while iter <= n_iters:
-            print(iter)
+            # print(iter)
             batch = self.batcher.next_batch()
             try:
                 mle_loss, r = self.train_one_batch(batch, iter)
@@ -265,6 +265,53 @@ class Train(object):
 
             if iter % save_every == 0:
                 self.save_model(iter)
+
+
+class TaskTrain(Train):
+    def __init__(self, vocab, batcher, opt):
+        super().__init__(vocab, batcher, opt) 
+
+    
+    def train_one_batch(self, batch, iter):
+        enc_batch, enc_seg_batch, enc_lens, enc_padding_mask, enc_batch_extend_vocab, extra_zeros, context = get_enc_seg_data(batch)
+
+        enc_batch = self.model.embeds(enc_batch)                                                    #Get embeddings for encoder input
+        enc_seg_batch = self.model.seg_embeds(enc_seg_batch)
+        enc_batch = T.cat([enc_batch, enc_seg_batch], dim=2)
+        enc_out, enc_hidden = self.model.encoder(enc_batch, enc_lens)
+
+        # -------------------------------Summarization-----------------------
+        if self.opt.train_mle == "yes":                                                             #perform MLE training
+            mle_loss = self.train_batch_MLE(enc_out, enc_hidden, enc_padding_mask, context, extra_zeros, enc_batch_extend_vocab, batch)
+        else:
+            mle_loss = get_cuda(T.FloatTensor([0]))
+
+        # --------------RL training-----------------------------------------------------
+        if self.opt.train_rl == "yes":                                                              #perform reinforcement learning training
+            # multinomial sampling
+            sample_sents, RL_log_probs = self.train_batch_RL(enc_out, enc_hidden, enc_padding_mask, context, extra_zeros, enc_batch_extend_vocab, batch.art_oovs, greedy=False)
+            with T.autograd.no_grad():
+                # greedy sampling
+                greedy_sents, _ = self.train_batch_RL(enc_out, enc_hidden, enc_padding_mask, context, extra_zeros, enc_batch_extend_vocab, batch.art_oovs, greedy=True)
+
+            sample_reward = self.reward_function(sample_sents, batch.original_abstracts)
+            baseline_reward = self.reward_function(greedy_sents, batch.original_abstracts)
+            # if iter%200 == 0:
+            #     self.write_to_file(sample_sents, greedy_sents, batch.original_abstracts, sample_reward, baseline_reward, iter)
+            rl_loss = -(sample_reward - baseline_reward) * RL_log_probs                             #Self-critic policy gradient training (eq 15 in https://arxiv.org/pdf/1705.04304.pdf)
+            rl_loss = T.mean(rl_loss)
+
+            batch_reward = T.mean(sample_reward).item()
+        else:
+            rl_loss = get_cuda(T.FloatTensor([0]))
+            batch_reward = 0
+
+    # ------------------------------------------------------------------------------------
+        self.trainer.zero_grad()
+        (self.opt.mle_weight * mle_loss + self.opt.rl_weight * rl_loss).backward()
+        self.trainer.step()
+
+        return mle_loss.item(), batch_reward        
 
 
 if __name__ == "__main__":
