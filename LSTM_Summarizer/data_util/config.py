@@ -1,5 +1,5 @@
 
-log_root = "/Users/rowancassius/Desktop/capstone/LSTM_Summarizer/"
+log_root = "/Users/georg/w210/capstone/LSTM_Summarizer/"
 
 train_data_path = 	"data/chunked/train/train_*"
 valid_data_path = 	"data/chunked/valid/valid_*"
