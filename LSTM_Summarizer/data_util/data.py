@@ -4,8 +4,12 @@ import glob
 import random
 import struct
 import csv
+import pandas as pd
 from tensorflow.core.example import example_pb2
 from transformers import BertTokenizer
+
+from data_util.preprocess import *
+
 
 # <s> and </s> are used in the data files to segment the abstracts into sentences. They don't receive vocab ids.
 SENTENCE_START = '<s>'
@@ -64,7 +68,7 @@ class Vocab(object):
     with open(vocab_file, 'r') as vocab_f:
       for line in vocab_f:
         pieces = line.split()
-        if len(pieces) != 2:
+        if len(pieces) != 1:
           print('Warning: incorrectly formatted line in vocabulary file: %s\n' % line)
           continue
         w = pieces[0]
@@ -96,13 +100,14 @@ class Vocab(object):
   def size(self):
     return self._count
 
-  def write_metadata(self, fpath):
-    print("Writing word embedding metadata file to %s..." % (fpath))
-    with open(fpath, "w") as f:
-      fieldnames = ['word']
-      writer = csv.DictWriter(f, delimiter="\t", fieldnames=fieldnames)
-      for i in range(self.size()):
-        writer.writerow({"word": self._id_to_word[i]})
+  # def write_metadata(self, fpath):
+  #   print("Writing word embedding metadata file to %s..." % (fpath))
+  #   with open(fpath, "w") as f:
+  #     fieldnames = ['word']
+  #     writer = csv.DictWriter(f, delimiter="\t", fieldnames=fieldnames)
+  #     for i in range(self.size()):
+  #       writer.writerow({"word": self._id_to_word[i]})
+
 
 class BertVocab(Vocab):
   def __init__(self):
@@ -221,3 +226,22 @@ def show_abs_oovs(abstract, vocab, article_oovs):
       new_words.append(w)
   out_str = ' '.join(new_words)
   return out_str
+
+
+
+####### Additional Helper Functions for TaskExamples ##########
+
+def word2id(word, vocab, entity_label_map):
+    if word in entity_label_map:
+      return vocab.word2id(entity_label_map[word])
+    return vocab.word2id(word) 
+
+def words2ids(words, vocab, entity_label_map):
+    return [word2id(w, vocab, entity_label_map) for w in words]
+
+
+def doc2words(doc):
+    return [w.text if w.ent_type_ else w.text.lower() for w in doc]
+
+def words2vocabfile(words, fpath):
+    pd.DataFrame(words).to_csv(fpath, sep='\t', header=False, index=False)

@@ -3,7 +3,7 @@
 # imports
 import re
 import numpy as np
-from nltk.tokenize import sent_tokenize, word_tokenize  
+from nltk.tokenize import sent_tokenize, word_tokenize
 
 # Regexes
 HTML = r'</?\w+/?>|>|<'
@@ -17,7 +17,7 @@ NON_NUM = '[^0-9]'
 
 EMAIL_TIME = "[0-9]?[0-9]:[0-9][0-9]\s[AP]M"
 EA = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b"
-PH = r"(\d{0,2}[\s\.-]{0,3}\(?\d{0,3}\)?[\s\.-]{0,3}\d{3}[\s\.-]{0,3}\d{4})"
+PH = r"(\d{0,2}[\s\.-]{0,3}\(?\d{0,3}\)?[\s\.-]{0,3}\d{3,4}[\s\.-]{0,3}\d{3,4})\b"
 WB = r"""(?i)\b((?:https?:(?:/{1,3}|[a-z0-9%])|[a-z0-9.\-]+[.](?:com|net|org|edu|gov|mil|aero|asia|biz|cat|coop|info|int|jobs|mobi|museum|name|post|pro|tel|travel|xxx|ac|ad|ae|af|ag|ai|al|am|an|ao|aq|ar|as|at|au|aw|ax|az|ba|bb|bd|be|bf|bg|bh|bi|bj|bm|bn|bo|br|bs|bt|bv|bw|by|bz|ca|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|co|cr|cs|cu|cv|cx|cy|cz|dd|de|dj|dk|dm|do|dz|ec|ee|eg|eh|er|es|et|eu|fi|fj|fk|fm|fo|fr|ga|gb|gd|ge|gf|gg|gh|gi|gl|gm|gn|gp|gq|gr|gs|gt|gu|gw|gy|hk|hm|hn|hr|ht|hu|id|ie|il|im|in|io|iq|ir|is|it|je|jm|jo|jp|ke|kg|kh|ki|km|kn|kp|kr|kw|ky|kz|la|lb|lc|li|lk|lr|ls|lt|lu|lv|ly|ma|mc|md|me|mg|mh|mk|ml|mm|mn|mo|mp|mq|mr|ms|mt|mu|mv|mw|mx|my|mz|na|nc|ne|nf|ng|ni|nl|no|np|nr|nu|nz|om|pa|pe|pf|pg|ph|pk|pl|pm|pn|pr|ps|pt|pw|py|qa|re|ro|rs|ru|rw|sa|sb|sc|sd|se|sg|sh|si|sj|Ja|sk|sl|sm|sn|so|sr|ss|st|su|sv|sx|sy|sz|tc|td|tf|tg|th|tj|tk|tl|tm|tn|to|tp|tr|tt|tv|tw|tz|ua|ug|uk|us|uy|uz|va|vc|ve|vg|vi|vn|vu|wf|ws|ye|yt|yu|za|zm|zw)/)(?:[^\s()<>{}\[\]]+|\([^\s()]*?\([^\s()]+\)[^\s()]*?\)|\([^\s]+?\))+(?:\([^\s()]*?\([^\s()]+\)[^\s()]*?\)|\([^\s]+?\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’])|(?:(?<!@)[a-z0-9]+(?:[.\-][a-z0-9]+)*[.](?:com|net|org|edu|gov|mil|aero|asia|biz|cat|coop|info|int|jobs|mobi|museum|name|post|pro|tel|travel|xxx|ac|ad|ae|af|ag|ai|al|am|an|ao|aq|ar|as|at|au|aw|ax|az|ba|bb|bd|be|bf|bg|bh|bi|bj|bm|bn|bo|br|bs|bt|bv|bw|by|bz|ca|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|co|cr|cs|cu|cv|cx|cy|cz|dd|de|dj|dk|dm|do|dz|ec|ee|eg|eh|er|es|et|eu|fi|fj|fk|fm|fo|fr|ga|gb|gd|ge|gf|gg|gh|gi|gl|gm|gn|gp|gq|gr|gs|gt|gu|gw|gy|hk|hm|hn|hr|ht|hu|id|ie|il|im|in|io|iq|ir|is|it|je|jm|jo|jp|ke|kg|kh|ki|km|kn|kp|kr|kw|ky|kz|la|lb|lc|li|lk|lr|ls|lt|lu|lv|ly|ma|mc|md|me|mg|mh|mk|ml|mm|mn|mo|mp|mq|mr|ms|mt|mu|mv|mw|mx|my|mz|na|nc|ne|nf|ng|ni|nl|no|np|nr|nu|nz|om|pa|pe|pf|pg|ph|pk|pl|pm|pn|pr|ps|pt|pw|py|qa|re|ro|rs|ru|rw|sa|sb|sc|sd|se|sg|sh|si|sj|Ja|sk|sl|sm|sn|so|sr|ss|st|su|sv|sx|sy|sz|tc|td|tf|tg|th|tj|tk|tl|tm|tn|to|tp|tr|tt|tv|tw|tz|ua|ug|uk|us|uy|uz|va|vc|ve|vg|vi|vn|vu|wf|ws|ye|yt|yu|za|zm|zw)\b/?(?!@)))"""
 BLACK = "[^A-Za-z0-9\s\?!,'\.;:/\-@*%#~&]+"
 
@@ -108,11 +108,24 @@ def format_phone_number(phone_number):
         return f' {country}-{area}-{loc3}-{loc4} '
 
 
-
+######################################
 ###### Processing for Examples #######
+######################################
 
-import en_core_web_sm
-nlp = en_core_web_sm.load()
+# imports
+import spacy
+from collections import OrderedDict
+
+# Regexes
+ANYSPACE = '[\t\n\s]'
+SENDER = 'SENDER'
+ENRON = r'(Enron|enron|ENRON)'
+BLACK_NO_PER = "[^A-Za-z0-9\s\?!,';:/\-@*%#~&]+"
+EXT_PER = r'[\.\?\!,]\.' # extra period
+ext_per_repl = lambda match: match.group()[0]   # extra period fixer
+
+# Constants
+CAP_WORDS = {'I'}
 
 ENT_TAGS = {
     'PERSON',
@@ -135,23 +148,75 @@ ENT_TAGS = {
     'CARDINAL'
 }
 
-CAP_WORDS = {'SENDER', 'I'}.union(INFO_CATS, ENT_TAGS)
+expressions = {
+    PHONE:  PH,
+    EMAIL:  EA,
+    WEB:    WB,
+    SENDER: SENDER,
+    'ORG':  ENRON
+}
+
+ENT_TAGS = ENT_TAGS.union(expressions.keys())
 
 
-def process_text(text):
-    text = clean_info(text)
-    text = replace_NE(text)
-    text = re.sub(BLACK, '', text)
-    tokens = [t if t in CAP_WORDS else t.lower() for 
-              t in word_tokenize(text)]
-    return tokens
+# Helper Functions
+def ranges_overlap(a1, a2, b1, b2):
+    'Assume a1 < a2 and b1 < b2'
+    return not(max(a1, a2) < min(b1, b2) or 
+               max(b1, b2) < min(a1, a2))
 
+def tighten_bounds(start, end, text):
+    'Tighten the bounds around a match'
+    while re.match(ANYSPACE, text[start]): start += 1
+    while re.match(ANYSPACE, text[end-1]): end -= 1
+    return start, end
 
-def replace_NE(text):
-    'Replace the named entities with their types'
-    ent_lab = {e.text: e.label_ for e in nlp(text).ents if 
-               e.text not in INFO_CATS}
-    for ent, lab in ent_lab.items():
-        text = re.sub(ent, lab, text)
+def lower_first_token(text):
+    first, rest = text.split(' ', 1)
+    return first.lower() + ' ' + rest
+
+# Minimal processing - make arciles resemble natural language
+def article_process_text(text):
+    return core_process_text(text, BLACK)
+
+def summary_process_text(text):
+    text = lower_first_token(text)
+    text =  core_process_text(text, BLACK_NO_PER)
+    tokens = [t.text if t.ent_type_ else t.text.lower() for t in nlp(text)]
+    text = ' '.join(tokens)
     return text
+
+def vocab_process_text(text):
+    text = core_process_text(text, BLACK)
+    tokens = [t.ent_type_ if t.ent_type_ else t.text.lower() for t in nlp(text)]
+    text = ' '.join(tokens)
+    return text
+
+def core_process_text(text, ERASE):
+    text = re.sub(ERASE, '', text) 
+    text = re.sub(EXT_PER, ext_per_repl, text)
+    return text
+
+def custom_ents(doc):
+    # Add cutom entities
+    spans = []
+    for label, expression in expressions.items():
+        for match in re.finditer(expression, doc.text):
+            start, end = match.span()
+            start, end = tighten_bounds(start, end, doc.text)
+            span = doc.char_span(start, end, label=label)
+            if span: 
+                spans.append(span)
+    # Add spans to the doc.ents
+    doc.ents = list(doc.ents) + spans
+    return doc
+
+
+# CREATE CUSTOM NLP function from SpaCy
+nlp = spacy.load("en_core_web_sm", disable=["tagger", "parser"])
+nlp.add_pipe(custom_ents, name = 'custom', first=True)
+nlp.add_pipe(nlp.create_pipe("merge_entities"))
+
+
+
 
