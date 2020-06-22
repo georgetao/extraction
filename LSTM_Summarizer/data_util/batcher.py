@@ -10,6 +10,7 @@ import tensorflow as tf
 
 from . import config
 from . import data
+from .preprocess import *
 
 import random
 random.seed(1234)
@@ -46,6 +47,7 @@ class Example(object):
 
     # Get a verison of the reference summary where in-article OOVs are represented by their temporary article OOV id
     abs_ids_extend_vocab = data.abstract2ids(abstract_words, vocab, self.article_oovs)
+    print(abs_ids_extend_vocab)
 
     # Get decoder target sequence
     _, self.target = self.get_dec_inp_targ_seqs(abs_ids_extend_vocab, config.max_dec_steps, start_decoding, stop_decoding)
@@ -54,6 +56,9 @@ class Example(object):
     self.original_article = article
     self.original_abstract = abstract
     self.original_abstract_sents = abstract_sentences
+
+
+
 
   def get_dec_inp_targ_seqs(self, sequence, max_len, start_id, stop_id):
     inp = [start_id] + sequence[:]
@@ -92,46 +97,85 @@ class TaskExample(Example):
     stop_decoding = vocab.word2id(data.STOP_DECODING)
 
     # Process the context and the task
-    context, task = context.split(), task.split()
+    context, task = nlp(context), nlp(task)
+    self.entity_label_map = {**{e.text: e.label_ for e in context.ents}, 
+                             **{e.text: e.label_ for e in task.ents}}
     
     # Reduce if necessary
-    if len(context + task) > config.max_enc_steps:
+    if len(context) + len(task) > config.max_enc_steps:
       t = min(len(task), config.max_enc_steps)
       c = max(0, config.max_enc_steps - t)
       # truncate
       task = task[:t]
       context = context[-c:] if c else []
     
-    # compose the message
-    article = context + task
-    
     # create inputs
-    self.enc_len = len(article) # store the length after truncation but before padding
-    self.enc_input = [vocab.word2id(w) for w in article] # list of word ids; OOVs are represented by the id for UNK token
+    self.enc_len = len(context) + len(task) # store the length after truncation but before padding
+    self.enc_input = self.doc2ids(context, vocab) + self.doc2ids(task, vocab) #;OOVs are represented by the id for UNK token
     self.enc_seg = [SEGMENT['context'] for _ in context] + [SEGMENT['task'] for _ in task]
 
-    # Process the summary
-    sum_words = summary.split() # list of strings
-    sum_ids = [vocab.word2id(w) for w in sum_words] # list of word ids; OOVs are represented by the id for UNK token
+    # words:     'the', 'papers' 'are' 'wet' '.' 'dry' 'the papers' '.'
+    # enc_input:   4      709      55   90   34    37    4   709    34
+    # enc_seg:     0       0       0    0    0     1     1    1     1
 
+    # Process the summary
+    summary = nlp(summary)
+    sum_ids = self.doc2ids(summary, vocab)
+  
     # Get the decoder input sequence and target sequence
     self.dec_input, _ = self.get_dec_inp_targ_seqs(sum_ids, config.max_dec_steps, start_decoding, stop_decoding)
     self.dec_len = len(self.dec_input)
 
     # If using pointer-generator mode, we need to store some extra info
     # Store a version of the enc_input where in-article OOVs are represented by their temporary OOV id; also store the in-article OOVs words themselves
-    self.enc_input_extend_vocab, self.article_oovs = data.article2ids(article, vocab)
-
+    self.enc_input_extend_vocab, self.article_oovs = data.article2ids(
+      data.doc2words(context) + data.doc2words(task), vocab
+    )
     # Get a verison of the reference summary where in-article OOVs are represented by their temporary article OOV id
-    sum_ids_extend_vocab = data.abstract2ids(sum_words, vocab, self.article_oovs)
+    sum_ids_extend_vocab = self.summary2ids(data.doc2words(summary), vocab)
+    self.summary = summary
+    self.summary_tokens = data.doc2words(summary)
+    self.sum_ids_extend_vocab = sum_ids_extend_vocab
 
     # Get decoder target sequence
     _, self.target = self.get_dec_inp_targ_seqs(
         sum_ids_extend_vocab, config.max_dec_steps, start_decoding, stop_decoding
     )
     # Store the original strings
-    self.original_article = article
+    self.original_article = context.text + task.text
     self.original_abstract = summary        
+
+  def word2id(self, word, vocab):
+      if word in self.entity_label_map:
+        return vocab.word2id(self.entity_label_map[word])
+      return vocab.word2id(word) 
+
+  def doc2ids(self, doc, vocab):
+      # tokens = [t if t.ent_type_ else t.text.lower() for t in nlp(text)]
+      return [self.word2id(w.text, vocab) if w.ent_type_ else 
+              self.word2id(w.text.lower(), vocab) 
+              for w in doc]
+
+  def summary2ids(self, sum_words, vocab):
+    'Returns an id list where in-article OOVs are represented by temporary ids'
+    ids = []
+    unk_id = vocab.word2id(data.UNKNOWN_TOKEN)
+    for w in sum_words:
+      i = vocab.word2id(w)
+      if i == unk_id: # If w is an OOV word
+        is_oovs = np.array([[w is oov, w in oov] for oov in self.article_oovs]).T
+        if np.any(is_oovs): 
+          if any(is_oovs[0]): # If w is an in-article OOV 
+            oov = w 
+          else: # If w is in an in-article OOV
+            oov = self.article_oovs[np.argmax(is_oovs[1])]
+          vocab_idx = vocab.size() + self.article_oovs.index(oov) # Map to its temporary article OOV number
+          ids.append(vocab_idx)
+        else: # If w is an out-of-article OOV
+          ids.append(unk_id) # Map to the UNK token id
+      else:
+        ids.append(i)
+    return ids
 
 
 class Batch(object):
@@ -156,7 +200,7 @@ class Batch(object):
       for ex in example_list:
         ex.pad_encoder_segments(max_enc_seq_len, SEGMENT['padding'])
     except AttributeError: pass
-    
+
     # Initialize the numpy arrays
     # Note: our enc_batch can have different length (second dimension) for each batch because we use dynamic_rnn for the encoder.
     self.enc_batch = np.zeros((self.batch_size, max_enc_seq_len), dtype=np.int32)

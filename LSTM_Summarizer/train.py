@@ -278,6 +278,8 @@ class TaskTrain(Train):
         enc_batch = self.model.embeds(enc_batch)                                                    #Get embeddings for encoder input
         enc_seg_batch = self.model.seg_embeds(enc_seg_batch)
         enc_batch = T.cat([enc_batch, enc_seg_batch], dim=2)
+        # 'papers', context  -> [1,2,3]:[2,6,1]
+
         enc_out, enc_hidden = self.model.encoder(enc_batch, enc_lens)
 
         # -------------------------------Summarization-----------------------
