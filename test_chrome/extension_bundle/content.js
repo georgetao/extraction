@@ -4,6 +4,7 @@
 
 console.log(6)
 
+alert("content.js")
 
 // capture all text
 var path = window.location.pathname;
