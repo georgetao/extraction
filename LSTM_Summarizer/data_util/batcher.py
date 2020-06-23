@@ -163,12 +163,10 @@ class TaskExample(Example):
     for w in sum_words:
       i = vocab.word2id(w)
       if i == unk_id: # If w is an OOV word
-        is_oovs = np.array([[w is oov, w in oov] for oov in self.article_oovs]).T
-        if np.any(is_oovs): 
-          if any(is_oovs[0]): # If w is an in-article OOV 
-            oov = w 
-          else: # If w is in an in-article OOV
-            oov = self.article_oovs[np.argmax(is_oovs[1])]
+        w_ = w.lower()
+        is_oovs = np.array([[w_ is oov.lower(), w_ in oov.lower()] for oov in self.article_oovs]).T
+        if np.any(is_oovs):
+          oov = self.article_oovs[np.argmax(is_oovs[0] if any(is_oovs[0]) else is_oovs[1])]
           vocab_idx = vocab.size() + self.article_oovs.index(oov) # Map to its temporary article OOV number
           ids.append(vocab_idx)
         else: # If w is an out-of-article OOV
@@ -176,6 +174,10 @@ class TaskExample(Example):
       else:
         ids.append(i)
     return ids
+
+    # summary token _s_ will be represented by article OOV token _a_ if
+    #   * s.lower() == a.lower()
+    #   * s.lower() in a.lower()
 
 
 class Batch(object):
