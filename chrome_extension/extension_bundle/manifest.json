@@ -1,0 +1,16 @@
+ {
+  "manifest_version": 2,
+  "name": "ExtrAction",
+  "version": "0.7.5",
+  "permissions": ["activeTab", "https://us-central1-sigma-smile-251401.cloudfunctions.net/classifier/*"],
+  "description": "The goal is to be able to extract tasks and summarize them.",
+  "icons": {"16": "logo_v1_low_inverted",
+            "48": "logo_v1_low_inverted",
+            "128": "logo_v1_low_inverted" },
+  "browser_action": {
+   "default_icon": "logo_v1_low_inverted",
+   "default_title": "Working model of the baseline extension",
+   "default_popup": "popup.html"
+  }
+}
+
