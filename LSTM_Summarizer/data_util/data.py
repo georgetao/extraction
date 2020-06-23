@@ -239,7 +239,6 @@ def word2id(word, vocab, entity_label_map):
 def words2ids(words, vocab, entity_label_map):
     return [word2id(w, vocab, entity_label_map) for w in words]
 
-
 def doc2words(doc):
     return [w.text if w.ent_type_ else w.text.lower() for w in doc]
 

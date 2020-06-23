@@ -118,24 +118,19 @@ class TaskExample(Example):
     # enc_input:   4      709      55   90   34    37    4   709    34
     # enc_seg:     0       0       0    0    0     1     1    1     1
 
-    # Process the summary
-    summary = nlp(summary)
-    sum_ids = self.doc2ids(summary, vocab)
-  
-    # Get the decoder input sequence and target sequence
-    self.dec_input, _ = self.get_dec_inp_targ_seqs(sum_ids, config.max_dec_steps, start_decoding, stop_decoding)
-    self.dec_len = len(self.dec_input)
-
     # If using pointer-generator mode, we need to store some extra info
     # Store a version of the enc_input where in-article OOVs are represented by their temporary OOV id; also store the in-article OOVs words themselves
     self.enc_input_extend_vocab, self.article_oovs = data.article2ids(
       data.doc2words(context) + data.doc2words(task), vocab
     )
+
+    # Process the summary
     # Get a verison of the reference summary where in-article OOVs are represented by their temporary article OOV id
-    sum_ids_extend_vocab = self.summary2ids(data.doc2words(summary), vocab)
-    self.summary = summary
-    self.summary_tokens = data.doc2words(summary)
-    self.sum_ids_extend_vocab = sum_ids_extend_vocab
+    sum_ids, sum_ids_extend_vocab = self.summary2ids_(summary, vocab)
+
+    # Get the decoder input sequence and target sequence
+    self.dec_input, _ = self.get_dec_inp_targ_seqs(sum_ids, config.max_dec_steps, start_decoding, stop_decoding)
+    self.dec_len = len(self.dec_input)
 
     # Get decoder target sequence
     _, self.target = self.get_dec_inp_targ_seqs(
@@ -143,7 +138,9 @@ class TaskExample(Example):
     )
     # Store the original strings
     self.original_article = context.text + task.text
-    self.original_abstract = summary        
+    self.original_context = context.text
+    self.original_task = task.text
+    self.original_abstract = summary       
 
   def word2id(self, word, vocab):
       if word in self.entity_label_map:
@@ -151,33 +148,47 @@ class TaskExample(Example):
       return vocab.word2id(word) 
 
   def doc2ids(self, doc, vocab):
-      # tokens = [t if t.ent_type_ else t.text.lower() for t in nlp(text)]
       return [self.word2id(w.text, vocab) if w.ent_type_ else 
               self.word2id(w.text.lower(), vocab) 
               for w in doc]
 
-  def summary2ids(self, sum_words, vocab):
+  def summary2ids_(self, summary, vocab):
     'Returns an id list where in-article OOVs are represented by temporary ids'
     ids = []
+    ids_extend = []
     unk_id = vocab.word2id(data.UNKNOWN_TOKEN)
-    for w in sum_words:
-      i = vocab.word2id(w)
+    for w in nlp(summary):
+      w_text = w.text if w.ent_type_ else w.text.lower() # lower non-entities
+      i = vocab.word2id(w_text)
       if i == unk_id: # If w is an OOV word
-        w_ = w.lower()
+        w_ = w_text.lower()
         is_oovs = np.array([[w_ is oov.lower(), w_ in oov.lower()] for oov in self.article_oovs]).T
-        if np.any(is_oovs):
+        if np.any(is_oovs): # If w is an article OOV
           oov = self.article_oovs[np.argmax(is_oovs[0] if any(is_oovs[0]) else is_oovs[1])]
-          vocab_idx = vocab.size() + self.article_oovs.index(oov) # Map to its temporary article OOV number
-          ids.append(vocab_idx)
+          vocab_idx = vocab.size() + self.article_oovs.index(oov)
+          ids_extend.append(vocab_idx)
+          ids.append(vocab.word2id(w.ent_type_ if w.ent_type_ else w_text))
         else: # If w is an out-of-article OOV
-          ids.append(unk_id) # Map to the UNK token id
+          w_ids = [vocab.word2id(v.text.lower()) for v in nlp(w_text)]
+          ids_extend += w_ids
+          ids += w_ids
       else:
+        ids_extend.append(i)
         ids.append(i)
-    return ids
+    assert len(ids) == len(ids_extend)    
+    return ids, ids_extend 
 
     # summary token _s_ will be represented by article OOV token _a_ if
     #   * s.lower() == a.lower()
     #   * s.lower() in a.lower()
+
+  def pretty_print(self):
+    print(60*'=')
+    print('CONTEXT:', self.original_context, '\n')
+    print('TASK:   ', self.original_task, '\n')
+    print('SUMMARY:', self.original_abstract)
+    print(60*'=')
+
 
 
 class Batch(object):
