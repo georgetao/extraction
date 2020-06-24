@@ -5,8 +5,10 @@ function summarize() {
 
 	function status(response) {
 	  if (response.status >= 200 && response.status < 300) {
+	  	alert('good response')
 	    return Promise.resolve(response)
 	  } else {
+	  	alert('bad response')
 	    return Promise.reject(new Error(response.statusText))
 	  }
 	}
@@ -21,11 +23,19 @@ function summarize() {
 	    },
 	    body: JSON.stringify({"message": email_text})
 	  })
-	  .then(response => response.text())
+	  .then(response => response.json())
 	  .then(function (data) {
-	    // alert("data request succeeded with json response");
-	    // alert(data);
-	    document.getElementById("answer").value = data;
+	    // alert(data)
+	    reqs = data["requests"]
+	    certs = data["certainty"]
+
+	    // alert(reqs)
+	    // alert(certs)
+		for (var i=0; i < reqs.length; i++) {
+			var sentence = reqs[i]
+			var certainty = certs[i]
+			document.getElementById("answer").value +=  '\r\n' + sentence + '\r\n' + '\r\n';
+		}
 	    return data;
 	  })
 	  .catch(function (error) {
