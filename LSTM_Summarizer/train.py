@@ -23,15 +23,17 @@ if T.cuda.is_available():
     T.cuda.manual_seed_all(123)
 
 class Train(object):
-    def __init__(self, vocab, batcher, opt): 
+    def __init__(self, vocab, batcher, opt, model, val_batcher=None): 
         self.vocab = vocab
         self.batcher = batcher
+        self.val_batcher = val_batcher
         self.opt = opt
         self.start_id = self.vocab.word2id(data.START_DECODING)
         self.end_id = self.vocab.word2id(data.STOP_DECODING)
         self.pad_id = self.vocab.word2id(data.PAD_TOKEN)
         self.unk_id = self.vocab.word2id(data.UNKNOWN_TOKEN)
         time.sleep(5)
+        self.setup_train(model)
 
     def save_model(self, iter):
         save_path = config.save_model_path + "/%07d.tar" % iter
@@ -202,7 +204,7 @@ class Train(object):
     #             f.write("Sample_R: %.4f, Baseline_R: %.4f\n\n"%(sample_r[i].item(), baseline_r[i].item()))
 
 
-    def train_one_batch(self, batch, iter):
+    def train_one_batch(self, batch, iter, no_grad=False):
         enc_batch, enc_lens, enc_padding_mask, enc_batch_extend_vocab, extra_zeros, context = get_enc_data(batch)
 
         enc_batch = self.model.embeds(enc_batch)                                                    #Get embeddings for encoder input
@@ -210,7 +212,12 @@ class Train(object):
 
         # -------------------------------Summarization-----------------------
         if self.opt.train_mle == "yes":                                                             #perform MLE training
-            mle_loss = self.train_batch_MLE(enc_out, enc_hidden, enc_padding_mask, context, extra_zeros, enc_batch_extend_vocab, batch)
+            mle_loss = self.train_batch_MLE(enc_out, enc_hidden, enc_padding_mask, context, 
+                                            extra_zeros, enc_batch_extend_vocab, batch)
+            if no_grad:
+                with T.no_grad():
+                    mle_loss = self.train_batch_MLE(enc_out, enc_hidden, enc_padding_mask, context, 
+                                                    extra_zeros, enc_batch_extend_vocab, batch)
         else:
             mle_loss = get_cuda(T.FloatTensor([0]))
         # --------------RL training-----------------------------------------------------
@@ -240,11 +247,29 @@ class Train(object):
 
         return mle_loss.item(), batch_reward
 
-    def trainIters(self, n_iters, model, report_every=5, save_every=50):
-        iter = self.setup_train(model)
-        count = mle_total = r_total = 0
+    def get_val_loss(self):
+        assert self.val_batcher is not None
+        assert not self.val_batcher._single_pass
+
+        total_loss = count = 0
+        n_batches = len(self.val_batcher._examples) // self.val_batcher.batch_size 
+        batch = self.val_batcher.next_batch()
+
+        while count < n_batches:
+            mle_loss, r = self.train_one_batch(batch, iter=None, no_grad=True)
+            total_loss += mle_loss
+            count += 1
+            batch = self.val_batcher.next_batch()
+        val_loss = total_loss / count
+
+        return val_loss
+
+    def trainIters(self, n_iters, report_every=5, save_every=50):
+        iter = 0
+        count = mle_total = r_total = mle_val = 0
+        mle_losses = []
+        mle_losses_val = []
         while iter <= n_iters:
-            # print(iter)
             batch = self.batcher.next_batch()
             try:
                 mle_loss, r = self.train_one_batch(batch, iter)
@@ -258,36 +283,55 @@ class Train(object):
             iter += 1
 
             if iter % report_every == 0:
+                # Average Metrics
                 mle_avg = mle_total / count
                 r_avg = r_total / count
-                print("iter:", iter, "mle_loss:", "%.3f" % mle_avg, "reward:", "%.4f" % r_avg)
+
+                # Get val loss 
+                if iter % save_every == 0 and self.val_batcher is not None:
+                    mle_val = self.get_val_loss()
+                    mle_losses_val.append((iter, mle_val))
+
+                # Report
+                print(
+                    "iter:", iter, 
+                    "mle_loss:", "%.3f" % mle_avg, 
+                    "mle_loss_val:", "%.4f" % (mle_val if mle_val else -100)
+                )
+
+                mle_losses.append((iter, mle_avg))
                 count = mle_total = r_total = 0
 
             if iter % save_every == 0:
                 self.save_model(iter)
+                
 
+        return mle_losses
 
 class TaskTrain(Train):
-    def __init__(self, vocab, batcher, opt):
-        super().__init__(vocab, batcher, opt) 
+    def __init__(self, vocab, batcher, opt, model, val_batcher=None):
+        super().__init__(vocab, batcher, opt, model, val_batcher)       
 
-    
-    def train_one_batch(self, batch, iter):
+
+    def train_one_batch(self, batch, iter, no_grad=False):
         enc_batch, enc_seg_batch, enc_lens, enc_padding_mask, enc_batch_extend_vocab, extra_zeros, context = get_enc_seg_data(batch)
 
         enc_batch = self.model.embeds(enc_batch)                                                    #Get embeddings for encoder input
         enc_seg_batch = self.model.seg_embeds(enc_seg_batch)
         enc_batch = T.cat([enc_batch, enc_seg_batch], dim=2)
         # 'papers', context  -> [1,2,3]:[2,6,1]
-
         enc_out, enc_hidden = self.model.encoder(enc_batch, enc_lens)
 
         # -------------------------------Summarization-----------------------
         if self.opt.train_mle == "yes":                                                             #perform MLE training
-            mle_loss = self.train_batch_MLE(enc_out, enc_hidden, enc_padding_mask, context, extra_zeros, enc_batch_extend_vocab, batch)
+            mle_loss = self.train_batch_MLE(enc_out, enc_hidden, enc_padding_mask, context, 
+                                            extra_zeros, enc_batch_extend_vocab, batch)
+            if no_grad:
+                with T.no_grad():
+                    mle_loss = self.train_batch_MLE(enc_out, enc_hidden, enc_padding_mask, context, 
+                                                    extra_zeros, enc_batch_extend_vocab, batch)
         else:
             mle_loss = get_cuda(T.FloatTensor([0]))
-
         # --------------RL training-----------------------------------------------------
         if self.opt.train_rl == "yes":                                                              #perform reinforcement learning training
             # multinomial sampling
@@ -309,11 +353,12 @@ class TaskTrain(Train):
             batch_reward = 0
 
     # ------------------------------------------------------------------------------------
-        self.trainer.zero_grad()
-        (self.opt.mle_weight * mle_loss + self.opt.rl_weight * rl_loss).backward()
-        self.trainer.step()
+        if not no_grad:
+            self.trainer.zero_grad()
+            (self.opt.mle_weight * mle_loss + self.opt.rl_weight * rl_loss).backward()
+            self.trainer.step()
 
-        return mle_loss.item(), batch_reward        
+        return mle_loss.item(), batch_reward
 
 
 if __name__ == "__main__":

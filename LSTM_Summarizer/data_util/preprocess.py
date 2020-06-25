@@ -172,8 +172,12 @@ def tighten_bounds(start, end, text):
     return start, end
 
 def lower_first_token(text):
-    first, rest = text.split(' ', 1)
-    return first.lower() + ' ' + rest
+    split = text.split(' ', 1)
+    if len(split) == 2:
+        return split[0].lower() + ' ' + split[1]
+    else:
+        assert len(split) == 1
+        return split[0].lower()
 
 # Minimal processing - make arciles resemble natural language
 def article_process_text(text):

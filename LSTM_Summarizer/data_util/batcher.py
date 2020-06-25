@@ -57,9 +57,6 @@ class Example(object):
     self.original_abstract = abstract
     self.original_abstract_sents = abstract_sentences
 
-
-
-
   def get_dec_inp_targ_seqs(self, sequence, max_len, start_id, stop_id):
     inp = [start_id] + sequence[:]
     target = sequence[:]
@@ -188,7 +185,6 @@ class TaskExample(Example):
     print('TASK:   ', self.original_task, '\n')
     print('SUMMARY:', self.original_abstract)
     print(60*'=')
-
 
 
 class Batch(object):

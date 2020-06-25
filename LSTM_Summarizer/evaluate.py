@@ -21,15 +21,17 @@ def get_cuda(tensor):
     return tensor
 
 class Evaluate(object):
-    def __init__(self, vocab, batcher, opt):
+    def __init__(self, vocab, batcher, opt, model):
         self.vocab = vocab
         self.batcher = batcher
         self.opt = opt
         time.sleep(5)
+        self.setup_valid(model)
 
     def setup_valid(self, model):
         self.model = model(self.vocab.size())
         self.model = get_cuda(self.model)
+        print('model_path', os.path.join(config.save_model_path, self.opt.load_model))
         checkpoint = T.load(os.path.join(config.save_model_path, self.opt.load_model))
         self.model.load_state_dict(checkpoint["model_dict"])
 
@@ -43,8 +45,7 @@ class Evaluate(object):
                 f.write("ref: " + ref_sents[i] + "\n")
                 f.write("dec: " + decoded_sents[i] + "\n\n")
 
-    def evaluate_batch(self, model):
-        self.setup_valid(model)
+    def evaluate_batch(self):
         batch = self.batcher.next_batch()
         start_id = self.vocab.word2id(data.START_DECODING)
         end_id = self.vocab.word2id(data.STOP_DECODING)
@@ -95,15 +96,14 @@ class Evaluate(object):
 
         # scores = rouge.get_scores(decoded_sents, ref_sents, avg = True)
         
-        return decoded_sents, ref_sents  # , scores
+        return decoded_sents, ref_sents, article_sents  # , scores
 
 
 class TaskEvaluate(Evaluate):
-    def __init__(self, vocab, batcher, opt):
-        super().__init__(vocab, batcher, opt)
+    def __init__(self, vocab, batcher, opt, model):
+        super().__init__(vocab, batcher, opt, model)
 
-    def evaluate_batch(self, model):
-        self.setup_valid(model)
+    def evaluate_batch(self):
         batch = self.batcher.next_batch()
         start_id = self.vocab.word2id(data.START_DECODING)
         end_id = self.vocab.word2id(data.STOP_DECODING)
@@ -119,7 +119,6 @@ class TaskEvaluate(Evaluate):
                 enc_batch = self.model.embeds(enc_batch)                                                    #Get embeddings for encoder input
                 enc_seg_batch = self.model.seg_embeds(enc_seg_batch)
                 enc_batch = T.cat([enc_batch, enc_seg_batch], dim=2)
-                print(enc_batch.shape)
                 enc_out, enc_hidden = self.model.encoder(enc_batch, enc_lens)
 
             print('Summarizing Batch...')
@@ -157,7 +156,7 @@ class TaskEvaluate(Evaluate):
 
         # scores = rouge.get_scores(decoded_sents, ref_sents, avg = True)
         
-        return decoded_sents, ref_sents  # , scores
+        return decoded_sents, ref_sents, article_sents  # , scores
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
