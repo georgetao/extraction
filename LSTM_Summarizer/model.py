@@ -1,3 +1,5 @@
+import os
+
 import torch as T
 import torch.nn as nn
 import torch.nn.functional as F
@@ -292,6 +294,7 @@ class TaskModel(nn.Module):
         self.decoder = Decoder(vocab_size)
         self.embeds = nn.Embedding(vocab_size, config.emb_dim)
         self.seg_embeds = nn.Embedding(len(SEGMENT), config.emb_dim)
+        
         init_wt_normal(self.embeds.weight)
         init_wt_normal(self.seg_embeds.weight)
 
@@ -299,6 +302,11 @@ class TaskModel(nn.Module):
         self.decoder = get_cuda(self.decoder)
         self.embeds = get_cuda(self.embeds) 
         self.seg_embeds = get_cuda(self.seg_embeds)
+
+    def load_embeddings(self, file, fix=False):
+        self.embeds.load_state_dict(T.load(os.path.join(config.save_embedding_path, file)))
+        if fix:
+            self.embeds.weight.requires_grad = False
 
 class BertSumModel(nn.Module):
     def __init__(self):

@@ -31,7 +31,6 @@ class Evaluate(object):
     def setup_valid(self, model):
         self.model = model(self.vocab.size())
         self.model = get_cuda(self.model)
-        print('model_path', os.path.join(config.save_model_path, self.opt.load_model))
         checkpoint = T.load(os.path.join(config.save_model_path, self.opt.load_model))
         self.model.load_state_dict(checkpoint["model_dict"])
 

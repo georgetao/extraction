@@ -34,7 +34,7 @@ for u,t in zip(['[unused0]', '[unused1]'], [START_DECODING, STOP_DECODING]):
 
 class Vocab(object):
 
-  def __init__(self, words, max_size=0):
+  def __init__(self, vocab_file, max_size=0):
     self._word_to_id = {}
     self._id_to_word = {}
     self._count = 0 # keeps track of total number of words in the Vocab
@@ -46,46 +46,26 @@ class Vocab(object):
       self._count += 1
 
     # Read the vocab file and add words up to max_size
-    for w in words:
-      if w in [SENTENCE_START, SENTENCE_END, UNKNOWN_TOKEN, PAD_TOKEN, START_DECODING, STOP_DECODING]:
-        raise Exception('<s>, </s>, [UNK], [PAD], [START] and [STOP] shouldn\'t be in the vocab file, but %s is' % w)
-      if w in self._word_to_id:
-        raise Exception('Duplicated word in vocabulary file: %s' % w)
-      self._word_to_id[w] = self._count
-      self._id_to_word[self._count] = w
-      self._count += 1
-      if max_size != 0 and self._count >= max_size:
-        print("max_size of vocab was specified as %i; we now have %i words. Stopping reading." % (max_size, self._count))
-        break
-    print("Finished constructing vocabulary of %i total words. Last word added: %s" % (self._count, self._id_to_word[self._count-1]))
-
-
-  @classmethod  
-  def from_vocab_file(cls, vocab_file, max_size=0):
-    count = 0 
-    words = set()
-    # Read the vocab file and add words up to max_size
     with open(vocab_file, 'r') as vocab_f:
       for line in vocab_f:
         pieces = line.split()
         if len(pieces) != 1:
-          print('Warning: incorrectly formatted line in vocabulary file: %s\n' % line)
+          # print ('Warning: incorrectly formatted line in vocabulary file: %s\n' % line)
           continue
         w = pieces[0]
         if w in [SENTENCE_START, SENTENCE_END, UNKNOWN_TOKEN, PAD_TOKEN, START_DECODING, STOP_DECODING]:
-          raise Exception('<s>, </s>, [UNK], [PAD], [START] and [STOP] shouldn\'t be in the vocab file, but %s is' % w)
-        if w in words:
+          print('WARNING: <s>, </s>, [UNK], [PAD], [START] or [STOP] found in vocab file')
+          continue
+        if w in self._word_to_id:
           raise Exception('Duplicated word in vocabulary file: %s' % w)
-        words.add(w)
-        count += 1
-        if max_size != 0 and count >= max_size:
-          print("max_size of vocab was specified as %i; we now have %i words. Stopping reading." % (max_size, count))
+        self._word_to_id[w] = self._count
+        self._id_to_word[self._count] = w
+        self._count += 1
+        if max_size != 0 and self._count >= max_size:
+          print ("max_size of vocab was specified as %i; we now have %i words. Stopping reading." % (max_size, self._count))
           break
 
-    # create and return Vocab
-    vocab = cls(words, max_size)
-    return vocab
-
+      print ("Finished constructing vocabulary of %i total words. Last word added: %s" % (self._count, self._id_to_word[self._count-1]))
 
   def word2id(self, word):
     if word not in self._word_to_id:
@@ -100,14 +80,6 @@ class Vocab(object):
   def size(self):
     return self._count
 
-  # def write_metadata(self, fpath):
-  #   print("Writing word embedding metadata file to %s..." % (fpath))
-  #   with open(fpath, "w") as f:
-  #     fieldnames = ['word']
-  #     writer = csv.DictWriter(f, delimiter="\t", fieldnames=fieldnames)
-  #     for i in range(self.size()):
-  #       writer.writerow({"word": self._id_to_word[i]})
-
 
 class BertVocab(Vocab):
   def __init__(self):
@@ -116,21 +88,6 @@ class BertVocab(Vocab):
     self._id_to_word = self.tokenizer.ids_to_tokens
     self._count = self.tokenizer.vocab_size
 
-
-# def example_generator(example_list, single_pass):
-#   assert example_list, ('Error: Empty example list') # check examples exist
-#   while True:
-#     for example in example_list:
-#       try:
-#         x, y = example
-#         yield x, y
-#       except ValueError:
-#         print('Not a tuple of size 2, instead: ', example)
-#         pass
-
-#     if single_pass:
-#       print("example_generator completed reading all examples. No more data.")
-#       break
 
 def example_generator(example_list, single_pass):
   assert example_list, ('Error: Empty example list') # check examples exist

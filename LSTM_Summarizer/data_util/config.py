@@ -9,7 +9,7 @@ vocab_path      = 		"data/vocab"
 
 # Hyperparameters
 hidden_dim = 512
-emb_dim = 256
+emb_dim = 200 # 256
 batch_size = 200
 max_enc_steps = 100		#99% of the articles are within length 55
 max_dec_steps = 15		#99% of the titles are within length 15
@@ -26,6 +26,7 @@ max_iterations = 500 #500000
 
 
 save_model_path = "data/saved_models"
+save_embedding_path = "data/embeddings"
 
 intra_encoder = True
 intra_decoder = True

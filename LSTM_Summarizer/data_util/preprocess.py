@@ -117,9 +117,12 @@ import spacy
 from collections import OrderedDict
 
 # Regexes
+BAD_20 = r'\b20\b'
 ANYSPACE = '[\t\n\s]'
 SENDER = 'SENDER'
 ENRON = r'(Enron|enron|ENRON)'
+EMAIL_WORD = r'\b[Ee]\s?-?\s?[Mm][Aa][Ii][Ll]\b'
+ERASE = BAD_20 + '|' + BLACK
 BLACK_NO_PER = "[^A-Za-z0-9\s\?!,';:/\-@*%#~&]+"
 EXT_PER = r'[\.\?\!,]\.' # extra period
 ext_per_repl = lambda match: match.group()[0]   # extra period fixer
@@ -162,8 +165,7 @@ ENT_TAGS = ENT_TAGS.union(expressions.keys())
 # Helper Functions
 def ranges_overlap(a1, a2, b1, b2):
     'Assume a1 < a2 and b1 < b2'
-    return not(max(a1, a2) < min(b1, b2) or 
-               max(b1, b2) < min(a1, a2))
+    return not(max(a1, a2) < min(b1, b2) or max(b1, b2) < min(a1, a2))
 
 def tighten_bounds(start, end, text):
     'Tighten the bounds around a match'
@@ -181,7 +183,7 @@ def lower_first_token(text):
 
 # Minimal processing - make arciles resemble natural language
 def article_process_text(text):
-    return core_process_text(text, BLACK)
+    return core_process_text(text, ERASE)
 
 def summary_process_text(text):
     text = lower_first_token(text)
@@ -191,13 +193,14 @@ def summary_process_text(text):
     return text
 
 def vocab_process_text(text):
-    text = core_process_text(text, BLACK)
+    text = core_process_text(text, ERASE)
     tokens = [t.ent_type_ if t.ent_type_ else t.text.lower() for t in nlp(text)]
     text = ' '.join(tokens)
     return text
 
 def core_process_text(text, ERASE):
     text = re.sub(ERASE, '', text) 
+    text = re.sub(EMAIL_WORD, 'email', text)
     text = re.sub(EXT_PER, ext_per_repl, text)
     return text
 
