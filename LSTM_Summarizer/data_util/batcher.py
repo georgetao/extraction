@@ -146,8 +146,7 @@ class TaskExample(Example):
 
   def doc2ids(self, doc, vocab):
       return [self.word2id(w.text, vocab) if w.ent_type_ else 
-              self.word2id(w.text.lower(), vocab) 
-              for w in doc]
+              self.word2id(w.text.lower(), vocab) for w in doc]
 
   def summary2ids_(self, summary, vocab):
     'Returns an id list where in-article OOVs are represented by temporary ids'
@@ -262,6 +261,8 @@ class Batch(object):
   def store_orig_strings(self, example_list):
     self.original_articles = [ex.original_article for ex in example_list] # list of lists
     self.original_abstracts = [ex.original_abstract for ex in example_list] # list of lists
+    self.original_tasks = [ex.original_task for ex in example_list]
+    self.original_contexts = [ex.original_context for ex in example_list]
     # self.original_abstracts_sents = [ex.original_abstract_sents for ex in example_list] # list of list of lists
 
 

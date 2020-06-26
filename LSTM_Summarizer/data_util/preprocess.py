@@ -120,7 +120,7 @@ from collections import OrderedDict
 BAD_20 = r'\b20\b'
 ANYSPACE = '[\t\n\s]'
 SENDER = 'SENDER'
-ENRON = r'(Enron|enron|ENRON)'
+ENRON = r'\b(Enron|enron|ENRON)\b'
 EMAIL_WORD = r'\b[Ee]\s?-?\s?[Mm][Aa][Ii][Ll]\b'
 ERASE = BAD_20 + '|' + BLACK
 BLACK_NO_PER = "[^A-Za-z0-9\s\?!,';:/\-@*%#~&]+"
@@ -167,6 +167,9 @@ def ranges_overlap(a1, a2, b1, b2):
     'Assume a1 < a2 and b1 < b2'
     return not(max(a1, a2) < min(b1, b2) or max(b1, b2) < min(a1, a2))
 
+def compatible_with_ranges(start, end, ranges):
+    return not any([ranges_overlap(start, end, s, e) for s,e in ranges])
+
 def tighten_bounds(start, end, text):
     'Tighten the bounds around a match'
     while re.match(ANYSPACE, text[start]): start += 1
@@ -190,6 +193,12 @@ def summary_process_text(text):
     text =  core_process_text(text, BLACK_NO_PER)
     tokens = [t.text if t.ent_type_ else t.text.lower() for t in nlp(text)]
     text = ' '.join(tokens)
+    # try:
+    #     tokens = [t.text if t.ent_type_ else t.text.lower() for t in nlp(text)]
+    #     text = ' '.join(tokens)
+    # except:
+    #     print('failed', text)
+    
     return text
 
 def vocab_process_text(text):
@@ -207,13 +216,16 @@ def core_process_text(text, ERASE):
 def custom_ents(doc):
     # Add cutom entities
     spans = []
+    ranges = []
     for label, expression in expressions.items():
         for match in re.finditer(expression, doc.text):
             start, end = match.span()
             start, end = tighten_bounds(start, end, doc.text)
             span = doc.char_span(start, end, label=label)
-            if span: 
+            if span and compatible_with_ranges(start, end, ranges): # check span does't overlap prior spans
                 spans.append(span)
+                ranges.append((start, end))
+            
     # Add spans to the doc.ents
     doc.ents = list(doc.ents) + spans
     return doc

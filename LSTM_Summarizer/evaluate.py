@@ -109,7 +109,8 @@ class TaskEvaluate(Evaluate):
         unk_id = self.vocab.word2id(data.UNKNOWN_TOKEN)
         decoded_sents = []
         ref_sents = []
-        article_sents = []
+        task_sents = []
+        context_sents = []
         rouge = Rouge()
         while batch is not None:
             enc_batch, enc_seg_batch, enc_lens, enc_padding_mask, enc_batch_extend_vocab, extra_zeros, ct_e = get_enc_seg_data(batch)
@@ -139,12 +140,11 @@ class TaskEvaluate(Evaluate):
 
             for i in range(len(pred_ids)):
                 decoded_words = data.outputids2words(pred_ids[i], self.vocab, batch.art_oovs[i])
-                decoded_words = " ".join(decoded_words)
-                decoded_sents.append(decoded_words)
-                abstract = batch.original_abstracts[i]
-                article = batch.original_articles[i]
-                ref_sents.append(abstract)
-                article_sents.append(article)
+                decoded_sents.append(" ".join(decoded_words))
+                ref_sents.append(batch.original_abstracts[i])
+                task_sents.append(batch.original_tasks[i])
+                context_sents.append(batch.original_contexts[i])
+
 
             batch = self.batcher.next_batch()
 
@@ -155,7 +155,7 @@ class TaskEvaluate(Evaluate):
 
         # scores = rouge.get_scores(decoded_sents, ref_sents, avg = True)
         
-        return decoded_sents, ref_sents, article_sents  # , scores
+        return decoded_sents, ref_sents, task_sents, context_sents
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

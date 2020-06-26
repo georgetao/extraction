@@ -27,6 +27,7 @@ max_iterations = 500 #500000
 
 save_model_path = "data/saved_models"
 save_embedding_path = "data/embeddings"
+results_path = "data/results"
 
 intra_encoder = True
 intra_decoder = True

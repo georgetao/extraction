@@ -306,7 +306,7 @@ class Train(object):
                 self.save_model(iter)
                 
 
-        return mle_losses
+        return {'train': mle_losses, 'val': mle_losses_val}
 
 class TaskTrain(Train):
     def __init__(self, vocab, batcher, opt, model, val_batcher=None):
