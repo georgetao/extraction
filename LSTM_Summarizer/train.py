@@ -23,15 +23,17 @@ if T.cuda.is_available():
     T.cuda.manual_seed_all(123)
 
 class Train(object):
-    def __init__(self, vocab, batcher, opt): 
+    def __init__(self, vocab, batcher, opt, model, val_batcher=None): 
         self.vocab = vocab
         self.batcher = batcher
+        self.val_batcher = val_batcher
         self.opt = opt
         self.start_id = self.vocab.word2id(data.START_DECODING)
         self.end_id = self.vocab.word2id(data.STOP_DECODING)
         self.pad_id = self.vocab.word2id(data.PAD_TOKEN)
         self.unk_id = self.vocab.word2id(data.UNKNOWN_TOKEN)
         time.sleep(5)
+        self.setup_train(model)
 
     def save_model(self, iter):
         save_path = config.save_model_path + "/%07d.tar" % iter
@@ -42,8 +44,8 @@ class Train(object):
         }, save_path)
         print('model saved at: \n', save_path)
 
-    def setup_train(self):
-        self.model = Model()
+    def setup_train(self, model):
+        self.model = model(self.vocab.size())
         self.model = get_cuda(self.model)
         self.trainer = T.optim.Adam(self.model.parameters(), lr=config.lr)
         start_iter = 0
@@ -80,13 +82,24 @@ class Train(object):
             use_gound_truth = get_cuda((T.rand(len(enc_out)) > 0.25)).long()                        #Probabilities indicating whether to use ground truth labels instead of previous decoded tokens
             x_t = use_gound_truth * dec_batch[:, t] + (1 - use_gound_truth) * x_t                   #Select decoder input based on use_ground_truth probabilities
             x_t = self.model.embeds(x_t)
-            final_dist, s_t, ct_e, sum_temporal_srcs, prev_s = self.model.decoder(x_t, s_t, enc_out, enc_padding_mask, ct_e, extra_zeros, enc_batch_extend_vocab, sum_temporal_srcs, prev_s)
+            x_t = x_t.squeeze()
+            final_dist, s_t, ct_e, sum_temporal_srcs, prev_s = self.model.decoder(
+                x_t, 
+                s_t, 
+                enc_out, 
+                enc_padding_mask, 
+                ct_e, 
+                extra_zeros, 
+                enc_batch_extend_vocab, 
+                sum_temporal_srcs, 
+                prev_s
+            )
             target = target_batch[:, t]
             log_probs = T.log(final_dist + config.eps)
             step_loss = F.nll_loss(log_probs, target, reduction="none", ignore_index=self.pad_id)
             step_losses.append(step_loss)
             x_t = T.multinomial(final_dist, 1).squeeze()                                            #Sample words from final distribution which can be used as input in next time step
-            is_oov = (x_t >= config.vocab_size).long()                                              #Mask indicating whether sampled word is OOV
+            is_oov = (x_t >= self.vocab.size()).long()                                              #Mask indicating whether sampled word is OOV
             x_t = (1 - is_oov) * x_t.detach() + (is_oov) * self.unk_id                              #Replace OOVs with [UNK] token
 
         losses = T.sum(T.stack(step_losses, 1), 1)                                                  #unnormalized losses for each example in the batch; (batch_size)
@@ -191,7 +204,7 @@ class Train(object):
     #             f.write("Sample_R: %.4f, Baseline_R: %.4f\n\n"%(sample_r[i].item(), baseline_r[i].item()))
 
 
-    def train_one_batch(self, batch, iter):
+    def train_one_batch(self, batch, iter, no_grad=False):
         enc_batch, enc_lens, enc_padding_mask, enc_batch_extend_vocab, extra_zeros, context = get_enc_data(batch)
 
         enc_batch = self.model.embeds(enc_batch)                                                    #Get embeddings for encoder input
@@ -199,7 +212,12 @@ class Train(object):
 
         # -------------------------------Summarization-----------------------
         if self.opt.train_mle == "yes":                                                             #perform MLE training
-            mle_loss = self.train_batch_MLE(enc_out, enc_hidden, enc_padding_mask, context, extra_zeros, enc_batch_extend_vocab, batch)
+            mle_loss = self.train_batch_MLE(enc_out, enc_hidden, enc_padding_mask, context, 
+                                            extra_zeros, enc_batch_extend_vocab, batch)
+            if no_grad:
+                with T.no_grad():
+                    mle_loss = self.train_batch_MLE(enc_out, enc_hidden, enc_padding_mask, context, 
+                                                    extra_zeros, enc_batch_extend_vocab, batch)
         else:
             mle_loss = get_cuda(T.FloatTensor([0]))
         # --------------RL training-----------------------------------------------------
@@ -229,11 +247,29 @@ class Train(object):
 
         return mle_loss.item(), batch_reward
 
-    def trainIters(self):
-        iter = self.setup_train()
-        count = mle_total = r_total = 0
-        while iter <= config.max_iterations:
-            print(iter)
+    def get_val_loss(self):
+        assert self.val_batcher is not None
+        assert not self.val_batcher._single_pass
+
+        total_loss = count = 0
+        n_batches = len(self.val_batcher._examples) // self.val_batcher.batch_size 
+        batch = self.val_batcher.next_batch()
+
+        while count < n_batches:
+            mle_loss, r = self.train_one_batch(batch, iter=None, no_grad=True)
+            total_loss += mle_loss
+            count += 1
+            batch = self.val_batcher.next_batch()
+        val_loss = total_loss / count
+
+        return val_loss
+
+    def trainIters(self, n_iters, report_every=5, save_every=50):
+        iter = 0
+        count = mle_total = r_total = mle_val = 0
+        mle_losses = []
+        mle_losses_val = []
+        while iter <= n_iters:
             batch = self.batcher.next_batch()
             try:
                 mle_loss, r = self.train_one_batch(batch, iter)
@@ -246,14 +282,83 @@ class Train(object):
             count += 1
             iter += 1
 
-            if iter % 5 == 0:
+            if iter % report_every == 0:
+                # Average Metrics
                 mle_avg = mle_total / count
                 r_avg = r_total / count
-                print("iter:", iter, "mle_loss:", "%.3f" % mle_avg, "reward:", "%.4f" % r_avg)
+
+                # Get val loss 
+                if iter % save_every == 0 and self.val_batcher is not None:
+                    mle_val = self.get_val_loss()
+                    mle_losses_val.append((iter, mle_val))
+
+                # Report
+                print(
+                    "iter:", iter, 
+                    "mle_loss:", "%.3f" % mle_avg, 
+                    "mle_loss_val:", "%.4f" % (mle_val if mle_val else -100)
+                )
+
+                mle_losses.append((iter, mle_avg))
                 count = mle_total = r_total = 0
 
-            if iter % 50 == 0:
+            if iter % save_every == 0:
                 self.save_model(iter)
+                
+
+        return {'train': mle_losses, 'val': mle_losses_val}
+
+class TaskTrain(Train):
+    def __init__(self, vocab, batcher, opt, model, val_batcher=None):
+        super().__init__(vocab, batcher, opt, model, val_batcher)       
+
+
+    def train_one_batch(self, batch, iter, no_grad=False):
+        enc_batch, enc_seg_batch, enc_lens, enc_padding_mask, enc_batch_extend_vocab, extra_zeros, context = get_enc_seg_data(batch)
+
+        enc_batch = self.model.embeds(enc_batch)                                                    #Get embeddings for encoder input
+        enc_seg_batch = self.model.seg_embeds(enc_seg_batch)
+        enc_batch = T.cat([enc_batch, enc_seg_batch], dim=2)
+        # 'papers', context  -> [1,2,3]:[2,6,1]
+        enc_out, enc_hidden = self.model.encoder(enc_batch, enc_lens)
+
+        # -------------------------------Summarization-----------------------
+        if self.opt.train_mle == "yes":                                                             #perform MLE training
+            mle_loss = self.train_batch_MLE(enc_out, enc_hidden, enc_padding_mask, context, 
+                                            extra_zeros, enc_batch_extend_vocab, batch)
+            if no_grad:
+                with T.no_grad():
+                    mle_loss = self.train_batch_MLE(enc_out, enc_hidden, enc_padding_mask, context, 
+                                                    extra_zeros, enc_batch_extend_vocab, batch)
+        else:
+            mle_loss = get_cuda(T.FloatTensor([0]))
+        # --------------RL training-----------------------------------------------------
+        if self.opt.train_rl == "yes":                                                              #perform reinforcement learning training
+            # multinomial sampling
+            sample_sents, RL_log_probs = self.train_batch_RL(enc_out, enc_hidden, enc_padding_mask, context, extra_zeros, enc_batch_extend_vocab, batch.art_oovs, greedy=False)
+            with T.autograd.no_grad():
+                # greedy sampling
+                greedy_sents, _ = self.train_batch_RL(enc_out, enc_hidden, enc_padding_mask, context, extra_zeros, enc_batch_extend_vocab, batch.art_oovs, greedy=True)
+
+            sample_reward = self.reward_function(sample_sents, batch.original_abstracts)
+            baseline_reward = self.reward_function(greedy_sents, batch.original_abstracts)
+            # if iter%200 == 0:
+            #     self.write_to_file(sample_sents, greedy_sents, batch.original_abstracts, sample_reward, baseline_reward, iter)
+            rl_loss = -(sample_reward - baseline_reward) * RL_log_probs                             #Self-critic policy gradient training (eq 15 in https://arxiv.org/pdf/1705.04304.pdf)
+            rl_loss = T.mean(rl_loss)
+
+            batch_reward = T.mean(sample_reward).item()
+        else:
+            rl_loss = get_cuda(T.FloatTensor([0]))
+            batch_reward = 0
+
+    # ------------------------------------------------------------------------------------
+        if not no_grad:
+            self.trainer.zero_grad()
+            (self.opt.mle_weight * mle_loss + self.opt.rl_weight * rl_loss).backward()
+            self.trainer.step()
+
+        return mle_loss.item(), batch_reward
 
 
 if __name__ == "__main__":

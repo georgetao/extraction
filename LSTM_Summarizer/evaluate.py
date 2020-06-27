@@ -21,14 +21,15 @@ def get_cuda(tensor):
     return tensor
 
 class Evaluate(object):
-    def __init__(self, vocab, batcher, opt):
+    def __init__(self, vocab, batcher, opt, model):
         self.vocab = vocab
         self.batcher = batcher
         self.opt = opt
         time.sleep(5)
+        self.setup_valid(model)
 
-    def setup_valid(self):
-        self.model = Model()
+    def setup_valid(self, model):
+        self.model = model(self.vocab.size())
         self.model = get_cuda(self.model)
         checkpoint = T.load(os.path.join(config.save_model_path, self.opt.load_model))
         self.model.load_state_dict(checkpoint["model_dict"])
@@ -43,9 +44,7 @@ class Evaluate(object):
                 f.write("ref: " + ref_sents[i] + "\n")
                 f.write("dec: " + decoded_sents[i] + "\n\n")
 
-    def evaluate_batch(self, print_sents = False):
-
-        self.setup_valid()
+    def evaluate_batch(self):
         batch = self.batcher.next_batch()
         start_id = self.vocab.word2id(data.START_DECODING)
         end_id = self.vocab.word2id(data.STOP_DECODING)
@@ -64,14 +63,23 @@ class Evaluate(object):
             print('Summarizing Batch...')
             #-----------------------Summarization----------------------------------------------------
             with T.autograd.no_grad():
-                pred_ids = beam_search(enc_hidden, enc_out, enc_padding_mask, ct_e, extra_zeros, enc_batch_extend_vocab, self.model, start_id, end_id, unk_id)
+                pred_ids = beam_search(
+                    enc_hidden, 
+                    enc_out, 
+                    enc_padding_mask, 
+                    ct_e, 
+                    extra_zeros, 
+                    enc_batch_extend_vocab, 
+                    self.model, 
+                    start_id, 
+                    end_id, 
+                    unk_id,
+                    self.vocab.size()
+                )
 
             for i in range(len(pred_ids)):
                 decoded_words = data.outputids2words(pred_ids[i], self.vocab, batch.art_oovs[i])
-                if len(decoded_words) < 2:
-                    decoded_words = "xxx"
-                else:
-                    decoded_words = " ".join(decoded_words)
+                decoded_words = " ".join(decoded_words)
                 decoded_sents.append(decoded_words)
                 abstract = batch.original_abstracts[i]
                 article = batch.original_articles[i]
@@ -85,10 +93,69 @@ class Evaluate(object):
         # if print_sents:
         #     self.print_original_predicted(decoded_sents, ref_sents, article_sents, load_file)
 
-        scores = rouge.get_scores(decoded_sents, ref_sents, avg = True)
+        # scores = rouge.get_scores(decoded_sents, ref_sents, avg = True)
         
-        return decoded_sents, ref_sents, scores
+        return decoded_sents, ref_sents, article_sents  # , scores
 
+
+class TaskEvaluate(Evaluate):
+    def __init__(self, vocab, batcher, opt, model):
+        super().__init__(vocab, batcher, opt, model)
+
+    def evaluate_batch(self):
+        batch = self.batcher.next_batch()
+        start_id = self.vocab.word2id(data.START_DECODING)
+        end_id = self.vocab.word2id(data.STOP_DECODING)
+        unk_id = self.vocab.word2id(data.UNKNOWN_TOKEN)
+        decoded_sents = []
+        ref_sents = []
+        task_sents = []
+        context_sents = []
+        rouge = Rouge()
+        while batch is not None:
+            enc_batch, enc_seg_batch, enc_lens, enc_padding_mask, enc_batch_extend_vocab, extra_zeros, ct_e = get_enc_seg_data(batch)
+            
+            with T.autograd.no_grad():
+                enc_batch = self.model.embeds(enc_batch)                                                    #Get embeddings for encoder input
+                enc_seg_batch = self.model.seg_embeds(enc_seg_batch)
+                enc_batch = T.cat([enc_batch, enc_seg_batch], dim=2)
+                enc_out, enc_hidden = self.model.encoder(enc_batch, enc_lens)
+
+            print('Summarizing Batch...')
+            #-----------------------Summarization----------------------------------------------------
+            with T.autograd.no_grad():
+                pred_ids = beam_search(
+                    enc_hidden, 
+                    enc_out, 
+                    enc_padding_mask, 
+                    ct_e, 
+                    extra_zeros, 
+                    enc_batch_extend_vocab, 
+                    self.model, 
+                    start_id, 
+                    end_id, 
+                    unk_id,
+                    self.vocab.size()
+                )
+
+            for i in range(len(pred_ids)):
+                decoded_words = data.outputids2words(pred_ids[i], self.vocab, batch.art_oovs[i])
+                decoded_sents.append(" ".join(decoded_words))
+                ref_sents.append(batch.original_abstracts[i])
+                task_sents.append(batch.original_tasks[i])
+                context_sents.append(batch.original_contexts[i])
+
+
+            batch = self.batcher.next_batch()
+
+        load_file = self.opt.load_model
+
+        # if print_sents:
+        #     self.print_original_predicted(decoded_sents, ref_sents, article_sents, load_file)
+
+        # scores = rouge.get_scores(decoded_sents, ref_sents, avg = True)
+        
+        return decoded_sents, ref_sents, task_sents, context_sents
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

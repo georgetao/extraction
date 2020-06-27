@@ -5,7 +5,7 @@ from train_util import get_cuda
 
 
 class Beam(object):
-    def __init__(self, start_id, end_id, unk_id, hidden_state, context):
+    def __init__(self, start_id, end_id, unk_id, hidden_state, context, vocab_size):
         h,c = hidden_state                                              #(n_hid,)
         self.tokens = T.LongTensor(config.beam_size,1).fill_(start_id)  #(beam, t) after t time steps
         self.scores = T.FloatTensor(config.beam_size,1).fill_(-30)      #beam,1; Initial score of beams = -30
@@ -19,11 +19,12 @@ class Beam(object):
         self.done = False
         self.end_id = end_id
         self.unk_id = unk_id
+        self.vocab_size = vocab_size
 
     def get_current_state(self):
         tokens = self.tokens[:,-1].clone()
         for i in range(len(tokens)):
-            if tokens[i].item() >= config.vocab_size:
+            if tokens[i].item() >= self.vocab_size:
                 tokens[i] = self.unk_id
         return tokens
 
@@ -55,7 +56,7 @@ class Beam(object):
             self.prev_s = prev_s[beams_order]                           #(beam, t, n_hid); sorted
         self.tokens = self.tokens[beams_order]                          #(beam, t); sorted
         self.tokens = T.cat([self.tokens, best_words], dim=1)           #(beam, t+1); sorted
-
+        
         #End condition is when top-of-beam is EOS.
         if best_words[0][0] == self.end_id:
             self.done = True
@@ -76,11 +77,23 @@ class Beam(object):
         return all_tokens
 
 
-def beam_search(enc_hid, enc_out, enc_padding_mask, ct_e, extra_zeros, enc_batch_extend_vocab, model, start_id, end_id, unk_id):
+def beam_search(
+    enc_hid, 
+    enc_out, 
+    enc_padding_mask, 
+    ct_e, 
+    extra_zeros, 
+    enc_batch_extend_vocab, 
+    model, 
+    start_id, 
+    end_id, 
+    unk_id,
+    vocab_size):
 
     batch_size = len(enc_hid[0])
     beam_idx = T.LongTensor(list(range(batch_size)))
-    beams = [Beam(start_id, end_id, unk_id, (enc_hid[0][i], enc_hid[1][i]), ct_e[i]) for i in range(batch_size)]   #For each example in batch, create Beam object
+    beams = [Beam(start_id, end_id, unk_id, (enc_hid[0][i], enc_hid[1][i]), ct_e[i], vocab_size) for 
+             i in range(batch_size)]                                    #For each example in batch, create Beam object
     n_rem = batch_size                                                  #Index of beams that are active, i.e: didn't generate [STOP] yet
     sum_temporal_srcs = None                                            #Number of examples in batch that didn't generate [STOP] yet
     prev_s = None
@@ -89,7 +102,7 @@ def beam_search(enc_hid, enc_out, enc_padding_mask, ct_e, extra_zeros, enc_batch
         x_t = T.stack(
             [beam.get_current_state() for beam in beams if beam.done == False]      #remaining(rem),beam
         ).contiguous().view(-1)                                                     #(rem*beam,)
-        x_t = model.embeds(x_t)                                                 #rem*beam, n_emb
+        x_t = model.embeds(x_t).squeeze()                                           #rem*beam, n_emb
 
         dec_h = T.stack(
             [beam.hid_h for beam in beams if beam.done == False]                    #rem*beam,n_hid

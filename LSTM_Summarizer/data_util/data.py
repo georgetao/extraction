@@ -4,7 +4,12 @@ import glob
 import random
 import struct
 import csv
+import pandas as pd
 from tensorflow.core.example import example_pb2
+from transformers import BertTokenizer
+
+from data_util.preprocess import *
+
 
 # <s> and </s> are used in the data files to segment the abstracts into sentences. They don't receive vocab ids.
 SENTENCE_START = '<s>'
@@ -17,10 +22,19 @@ STOP_DECODING = '[STOP]' # This has a vocab id, which is used at the end of untr
 
 # Note: none of <s>, </s>, [PAD], [UNK], [START], [STOP] should appear in the vocab file.
 
+bert_name = 'bert-base-uncased'
+
+# Create the Bert Tokenizer
+bert_tokenizer = BertTokenizer.from_pretrained(bert_name)
+# Update 
+for u,t in zip(['[unused0]', '[unused1]'], [START_DECODING, STOP_DECODING]):
+    bert_tokenizer.vocab[t] = bert_tokenizer.vocab[u]
+    bert_tokenizer.vocab.pop(u)
+
 
 class Vocab(object):
 
-  def __init__(self, words, max_size=0):
+  def __init__(self, vocab_file, max_size=0):
     self._word_to_id = {}
     self._id_to_word = {}
     self._count = 0 # keeps track of total number of words in the Vocab
@@ -32,45 +46,26 @@ class Vocab(object):
       self._count += 1
 
     # Read the vocab file and add words up to max_size
-    for w in words:
-      if w in [SENTENCE_START, SENTENCE_END, UNKNOWN_TOKEN, PAD_TOKEN, START_DECODING, STOP_DECODING]:
-        raise Exception('<s>, </s>, [UNK], [PAD], [START] and [STOP] shouldn\'t be in the vocab file, but %s is' % w)
-      if w in self._word_to_id:
-        raise Exception('Duplicated word in vocabulary file: %s' % w)
-      self._word_to_id[w] = self._count
-      self._id_to_word[self._count] = w
-      self._count += 1
-      if max_size != 0 and self._count >= max_size:
-        print("max_size of vocab was specified as %i; we now have %i words. Stopping reading." % (max_size, self._count))
-        break
-    print("Finished constructing vocabulary of %i total words. Last word added: %s" % (self._count, self._id_to_word[self._count-1]))
-
-
-  @classmethod  
-  def from_vocab_file(cls, vocab_file, max_size=0):
-    count = 0 
-    words = set()
-    # Read the vocab file and add words up to max_size
     with open(vocab_file, 'r') as vocab_f:
       for line in vocab_f:
         pieces = line.split()
-        if len(pieces) != 2:
-          print('Warning: incorrectly formatted line in vocabulary file: %s\n' % line)
+        if len(pieces) != 1:
+          # print ('Warning: incorrectly formatted line in vocabulary file: %s\n' % line)
           continue
         w = pieces[0]
         if w in [SENTENCE_START, SENTENCE_END, UNKNOWN_TOKEN, PAD_TOKEN, START_DECODING, STOP_DECODING]:
-          raise Exception('<s>, </s>, [UNK], [PAD], [START] and [STOP] shouldn\'t be in the vocab file, but %s is' % w)
-        if w in words:
+          print('WARNING: <s>, </s>, [UNK], [PAD], [START] or [STOP] found in vocab file')
+          continue
+        if w in self._word_to_id:
           raise Exception('Duplicated word in vocabulary file: %s' % w)
-        words.add(w)
-        count += 1
-        if max_size != 0 and count >= max_size:
-          print("max_size of vocab was specified as %i; we now have %i words. Stopping reading." % (max_size, count))
+        self._word_to_id[w] = self._count
+        self._id_to_word[self._count] = w
+        self._count += 1
+        if max_size != 0 and self._count >= max_size:
+          print ("max_size of vocab was specified as %i; we now have %i words. Stopping reading." % (max_size, self._count))
           break
 
-    # create and return Vocab
-    vocab = cls(words, max_size)
-    return vocab
+      print ("Finished constructing vocabulary of %i total words. Last word added: %s" % (self._count, self._id_to_word[self._count-1]))
 
   def word2id(self, word):
     if word not in self._word_to_id:
@@ -85,52 +80,22 @@ class Vocab(object):
   def size(self):
     return self._count
 
-  def write_metadata(self, fpath):
-    print("Writing word embedding metadata file to %s..." % (fpath))
-    with open(fpath, "w") as f:
-      fieldnames = ['word']
-      writer = csv.DictWriter(f, delimiter="\t", fieldnames=fieldnames)
-      for i in range(self.size()):
-        writer.writerow({"word": self._id_to_word[i]})
 
+class BertVocab(Vocab):
+  def __init__(self):
+    self.tokenizer = bert_tokenizer
+    self._word_to_id = self.tokenizer.vocab
+    self._id_to_word = self.tokenizer.ids_to_tokens
+    self._count = self.tokenizer.vocab_size
 
-# def example_generator(data_path, single_pass):
-#   while True:
-#     filelist = glob.glob(data_path) # get the list of datafiles
-#     assert filelist, ('Error: Empty filelist at %s' % data_path) # check filelist isn't empty
-#     if single_pass:
-#       filelist = sorted(filelist)
-#     else:
-#       random.shuffle(filelist)
-#     for f in filelist:
-#       reader = open(f, 'rb')
-#       while True:
-#         len_bytes = reader.read(8)
-#         if not len_bytes: break # finished reading this file
-#         str_len = struct.unpack('q', len_bytes)[0]
-#         example_str = struct.unpack('%ds' % str_len, reader.read(str_len))[0]
-#         yield example_pb2.Example.FromString(example_str)
-#     if single_pass:
-#       print("example_generator completed reading all datafiles. No more data.")
-#       break
-
-# custom example_generator for this project
 
 def example_generator(example_list, single_pass):
   assert example_list, ('Error: Empty example list') # check examples exist
   while True:
-    for example in example_list:
-      try:
-        x, y = example
-        yield x, y
-      except ValueError:
-        print('Not a tuple of size 2, instead: ', example)
-        pass
-
+    for example in example_list: yield example
     if single_pass:
       print("example_generator completed reading all examples. No more data.")
       break
-
 
 def article2ids(article_words, vocab):
   ids = []
@@ -218,3 +183,21 @@ def show_abs_oovs(abstract, vocab, article_oovs):
       new_words.append(w)
   out_str = ' '.join(new_words)
   return out_str
+
+
+
+####### Additional Helper Functions for TaskExamples ##########
+
+def word2id(word, vocab, entity_label_map):
+    if word in entity_label_map:
+      return vocab.word2id(entity_label_map[word])
+    return vocab.word2id(word) 
+
+def words2ids(words, vocab, entity_label_map):
+    return [word2id(w, vocab, entity_label_map) for w in words]
+
+def doc2words(doc):
+    return [w.text if w.ent_type_ else w.text.lower() for w in doc]
+
+def words2vocabfile(words, fpath):
+    pd.DataFrame(words).to_csv(fpath, sep='\t', header=False, index=False)
