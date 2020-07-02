@@ -31,12 +31,10 @@ def classify_text(request):
                 clean = preprocess.clean(sentence)
                 # clean info
                 clean = preprocess.clean_info(clean)
-
                 out.append(clean)
-                final_text+= " "+clean
             else:
                 out.append("")
-        return final_text
+        return out
     
     email_text = preprocess_text(email_text)
 
