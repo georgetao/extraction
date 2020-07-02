@@ -1,3 +1,29 @@
+// Currently takes an inputed text and classifies each sentence.
+// TODO: READ EMAILS INSTEAD OF INPUT TEXT.
+// TODO: INCORPORATE SUMMARIZATION MODEL.
+// TODO: ADD RESULT TO TODO LIST.
+
+//stage emails to be summarized
+function read_emails(email_list) {
+	console.log("read");
+}
+
+//summarize and stage summarizations to be added to todo list.
+function pseudo_summarize() {
+	console.log("summarize");
+}
+
+//should take in a list of strings.
+function add_to_todo() {
+	console.log("addstolist")
+}
+
+function start() {
+	read_emails();
+	pseudo_summarize();
+	add_to_todo();
+}
+
 function summarize() {
 	// alert("sending request to cloud fn");
 
@@ -46,5 +72,9 @@ function summarize() {
 	  });
 	}
 
+temp_emails = ["help me with my problem.", "You are cool."]
 
-document.getElementById('clickMe').addEventListener('click', summarize);
+document.getElementById('clickMe').addEventListener('click', start);
+
+// document.getElementById('clickMe').addEventListener('click', summarize);
+

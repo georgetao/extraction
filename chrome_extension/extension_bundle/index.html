@@ -4,15 +4,7 @@
   <head>
     <link rel="stylesheet" href="styles.css">
    <!--  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> -->
-    <style>
-      textarea {
-        height:100px;
-        width:200px;
-      }
-    </style>
-
   </head>
-
   <body>
       <h3>Input Text Here:</h3>
       <textarea id="myTextArea" name="myTextArea" rows="5" cols="30" placeholder="Paste Email Text Here"></textarea>
@@ -20,6 +12,27 @@
       &nbsp;
       <h3>Answer</h3>
       <textarea id="answer" rows="3" cols="30" placeholder="Model Output Appears Here"></textarea>
+      
+      <div class="settings">
+        <img src="img/settings.png" alt="Settings">
+      </div>
+
+      <div class="todoDiv">
+        <h3>To Do</h3>
+        <div class="checklist">
+          <label class ="container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            First todo.
+          </label> <br>
+
+          <label class ="container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+             Second todo.
+          </label> <br>
+        </div>
+      </div>
   </body>
   <script type="text/javascript" src="popup.js" defer></script>
 </html>

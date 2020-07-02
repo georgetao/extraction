@@ -4,13 +4,13 @@
   "version": "0.7.5",
   "permissions": ["activeTab", "https://us-central1-sigma-smile-251401.cloudfunctions.net/classifier/*"],
   "description": "The goal is to be able to extract tasks and summarize them.",
-  "icons": {"16": "logo_v1_low_inverted.png",
-            "48": "logo_v1_low_inverted.png",
-            "128": "logo_v1_low_inverted.png" },
+  "icons": {"16": "img/logo_v1_low_inverted.png",
+            "48": "img/logo_v1_low_inverted.png",
+            "128": "img/logo_v1_low_inverted.png" },
   "browser_action": {
-   "default_icon": "logo_v1_low_inverted.png",
+   "default_icon": "img/logo_v1_low_inverted.png",
    "default_title": "Working model of the baseline extension",
-   "default_popup": "popup.html"
+   "default_popup": "index.html"
   }
 }
 
