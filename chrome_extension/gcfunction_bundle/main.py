@@ -1,5 +1,5 @@
-# import sys
-# import os
+import sys
+import os
 import numpy
 from google.cloud import storage
 sys.path.append(os.path.abspath('models'))
@@ -35,7 +35,7 @@ def classify_text(request):
         return out
     
     print("load fasttext model")
-    # email_text = preprocess_text(email_text)
+    email_text = preprocess_text(email_text)
     ft_model = fasttext.load_model("models/best_ft_model.bin")
     sentences = sent_tokenize(email_text)
     res_dict = {"full_text": email_text}
