@@ -59,19 +59,19 @@ break_regex = make_regex([BRBR, HYPHENS, YW])
 comp_regex = make_regex(email_components+[EMAIL_TIME])
 
 def clean(text):
-    text = re.sub(break_regex, BREAK, text)
-    text = re.sub(HTML, SPACE, text)
-    text = re.sub(PH, phone_repl, text)
-    text = re.sub(BLACK, SPACE, text)
-    text = re.sub(WHITE, SPACE, text)
+    text = re.sub(break_regex, BREAK, str(text))
+    text = re.sub(HTML, SPACE, str(text))
+    text = re.sub(PH, phone_repl, str(text))
+    text = re.sub(BLACK, SPACE, str(text))
+    text = re.sub(WHITE, SPACE, str(text))
     text = text.strip()
     return text
 
 
 def clean_info(text):
-    text = re.sub(EA, EMAIL, text)
-    text = re.sub(PH, PHONE, text)
-    text = re.sub(WHITE, SPACE, text)
+    text = re.sub(EA, EMAIL, str(text))
+    text = re.sub(PH, PHONE, str(text))
+    text = re.sub(WHITE, SPACE, str(text))
     text = text.strip()
     return text
         
@@ -91,7 +91,7 @@ def format_phone_number(phone_number):
     # remove non digits
     digs = re.sub(NON_NUM, '', phone_number)
     # break into area and local
-    area, loc3, loc4 = digs[:-7], digs[-7:-3], digs[-3:]
+    area, loc3, loc4 = digs[:-7], digs[-7:-4], digs[-4:]
     
     if len(area) == 0:
         return f' {loc3}-{loc4} '
@@ -100,4 +100,3 @@ def format_phone_number(phone_number):
     else:
         country, area = area[:-3], area[-3:]
         return f' {country}-{area}-{loc3}-{loc4} '
-    
