@@ -2,38 +2,117 @@
 <html>
 <title>Test for Chrome Extension</title>
   <head>
+        <!-- Required meta tags always come first -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="styles.css">
    <!--  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> -->
   </head>
   <body>
-      <h3>Input Text Here:</h3>
-      <textarea id="myTextArea" name="myTextArea" rows="5" cols="30" placeholder="Paste Email Text Here"></textarea>
-      <a><button id="clickMe" class="dropbtn" >Submit</button></a>
-      &nbsp;
-      <h3>Answer</h3>
-      <textarea id="answer" rows="3" cols="30" placeholder="Model Output Appears Here"></textarea>
-      
-      <div class="settings">
-        <img src="img/settings.png" alt="Settings">
-      </div>
-
-      <div class="todoDiv">
-        <h3>To Do</h3>
-        <div class="checklist">
-          <label class ="container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-            First todo.
-          </label> <br>
-
-          <label class ="container">
-            <input type="checkbox">
-            <span class="checkmark"></span>
-             Second todo.
-          </label> <br>
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <h3>Input Text:</h3>
+          <textarea id="myTextArea" name="myTextArea" rows="5" cols="30" placeholder="Paste Email Text Here"></textarea>
+          <a><button id="clickMe" class="dropbtn" >Submit</button></a>
         </div>
       </div>
+
+      <div class="row">
+        <div class="col-12">
+          <h3>Answer</h3>
+          <textarea id="answer" rows="3" cols="30" placeholder="Model Output Appears Here"></textarea>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          <h3>To Do</h3>
+        </div>
+      </div>
+    </div>
+
+    <div class="container" id="checklist">
+      <div class="row">
+        <div class="col-10">
+          Todo #1.
+        </div>
+
+        <div class="col-2">
+          <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <img src="img/settings.png" alt="Settings">
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <a class="dropdown-item">Sender: George Tao</a>
+              <a href="#" class="dropdown-item">Go to original e-mail.</a>
+              <a href="#" class="dropdown-item">Mark as done.</a>
+              <a href="#" class="dropdown-item">Mark as spam.</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-10">
+          Todo #2.
+        </div>
+
+        <div class="col-2">
+          <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <img src="img/settings.png" alt="Settings">
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <a class="dropdown-item">Sender: George Tao</a>
+              <a href="#" class="dropdown-item">Go to original e-mail.</a>
+              <a href="#" class="dropdown-item">Mark as done.</a>
+              <a href="#" class="dropdown-item">Mark as spam.</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+<!--     <div class="dropdown-menu"> -->
+<!--       <img src="img/settings.png" alt="Settings"> -->
+      <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
+        <li><a tabindex="-1" href="#">Action</a></li>
+        <li><a tabindex="-1" href="#">Another action</a></li>
+        <li><a tabindex="-1" href="#">Something else here</a></li>
+        <li class="divider"></li>
+        <li><a tabindex="-1" href="#">Separated link</a></li>
+      </ul>
+    <!-- </div> -->
+
+
+    <!-- <div class="todoDiv">
+      <div id="checklist">
+        <label class ="container">
+          <input type="checkbox">
+          <span class="checkmark"></span>
+          First todo.
+        </label> <br>
+
+        <label class ="container">
+          <input type="checkbox">
+          <span class="checkmark"></span>
+           Second todo.
+        </label> <br>
+      </div>
+    </div> -->
   </body>
+
+    <!-- jQuery first, then Popper.js, then Bootstrap JS. -->
+  <script src="node_modules/jquery/dist/jquery.slim.min.js"></script>
+  <script src="node_modules/popper.js/dist/umd/popper.min.js"></script>
+  <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+  
   <script type="text/javascript" src="popup.js" defer></script>
 </html>
 
