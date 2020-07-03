@@ -1,8 +1,8 @@
-import sys
-import os
+# import sys
+# import os
 import numpy
 # from google.cloud import storage
-sys.path.append(os.path.abspath('models'))
+# sys.path.append(os.path.abspath('models'))
 import preprocess
 import nltk
 nltk.download('punkt')
@@ -36,12 +36,10 @@ def classify_text(request):
                 out.append("")
         return out
     
-    email_text = preprocess_text(email_text)
+    sentences = preprocess_text(email_text)
 
     print("load fasttext model")
     ft_model = fasttext.load_model("models/best_ft_model.bin")
-    # sentences = sent_tokenize(email_text)
-    sentences = email_text
     res_dict = {"full_text": email_text}
     reqs = []
     certs = []

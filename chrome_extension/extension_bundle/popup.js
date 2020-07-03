@@ -63,7 +63,7 @@ function summarize() {
 		for (var i=0; i < reqs.length; i++) {
 			var sentence = reqs[i]
 			var certainty = certs[i]
-			document.getElementById("answer").value +=  '\r\n' + sentence + '\r\n' + '\r\n';
+			document.getElementById("answer").value += sentence + '\r\n' + '\r\n';
 		}
 	    return data;
 	  })
@@ -74,7 +74,7 @@ function summarize() {
 
 temp_emails = ["help me with my problem.", "You are cool."]
 
-document.getElementById('clickMe').addEventListener('click', start);
+document.getElementById('clickMe').addEventListener('click', summarize);
 
 // document.getElementById('clickMe').addEventListener('click', summarize);
 

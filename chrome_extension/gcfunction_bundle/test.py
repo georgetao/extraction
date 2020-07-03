@@ -15,7 +15,6 @@ def classify_text(request):
     def preprocess_text(text):
         text = sent_tokenize(text)
         out = []
-        final_text = ""
         for sentence in text:
             if type(sentence) == str:
                 # clean text
@@ -24,19 +23,18 @@ def classify_text(request):
                 clean = preprocess.clean_info(clean)
 
                 out.append(clean)
-                final_text+= " "+clean
             else:
                 out.append("")
-        print("final_text:", final_text)
-        return final_text
+        return out
 
-    email_text = preprocess_text(request)
-
+    sentences = preprocess_text(request)
+    # sentences = sent_tokenize(request)
+    print("SENTENCE:",sentences)
+    print(type(sentences))
+    email_text=sentences
     print("load fasttext model")
     ft_model = fasttext.load_model("models/best_ft_model.bin")
     print(email_text)
-    # sentences = sent_tokenize(email_text)
-    sentences = email_text
     res_dict = {"full_text": email_text}
     print(sentences)
     reqs = []
@@ -50,7 +48,7 @@ def classify_text(request):
     
     res_dict["requests"] = reqs
     res_dict["certainty"] = certs
-    print(type(res_dict))
+    print(res_dict)
     return res_dict
 
 text = "Please call me back tomorrow at 1234567890. I like the color blue. Also, please print out both copies."
