@@ -1,14 +1,12 @@
-# SummarLight
-
-The Summarlight Chrome Extension highlights the most important parts of posts/stories/articles. You can find the extension <a href="https://chrome.google.com/webstore/detail/summarlight/ligjmagakdphdlenhhncfegpdbbendlg?hl=en-US&gl=US" target="_blank">here</a>.
+# ExtrAction
 
 <p align="center">
-  <img src="https://github.com/btahir/summarlight/blob/master/preview.png" width="350" title="preview">
+  <img src="https://github.com/rocassius/capstone/blob/master/chrome_extension/images/logo_v1_low_inverted.png" width="350" title="preview">
 </p>
 
 ## Project Summary
 
-The Summarlight Chrome extension is a simple chrome extension that uses a serverless architecture to generate summaries of the text of a web page. 
+ExtrAction is a simple chrome extension that uses a serverless architecture to obtain action items and summarize them into nice to-do lists. 
 
 ## Files Structure
 
