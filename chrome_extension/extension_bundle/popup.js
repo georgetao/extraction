@@ -124,7 +124,7 @@ function summarize() {
 
 temp_emails = ["help me with my problem.", "You are cool."]
 
-document.getElementById('clickMe').addEventListener('click', summarize);
+document.getElementById('clickMe').addEventListener('click', start);
 
 // document.getElementById('clickMe').addEventListener('click', summarize);
 
