@@ -10,3 +10,6 @@ __pycache__/
 
 # Gigaword/model data
 LSTM_Summarizer/data
+
+# NodeJS and NPM currently being used for lite-server
+chrome_extension/extension_bundle/node_modules

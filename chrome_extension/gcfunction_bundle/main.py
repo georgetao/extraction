@@ -1,8 +1,8 @@
 # import sys
 # import os
 import numpy
-from google.cloud import storage
-sys.path.append(os.path.abspath('models'))
+# from google.cloud import storage
+# sys.path.append(os.path.abspath('models'))
 import preprocess
 import nltk
 nltk.download('punkt')
@@ -10,7 +10,9 @@ from nltk import sent_tokenize
 import fasttext
 
 def classify_text(request):
+    print("request",request)
     request_json = request.get_json(silent=True)
+    print("request_json", request_json)
     email_text = ""
     if request.args and 'message' in request.args:
         email_text = request.args.get('message')
@@ -20,24 +22,24 @@ def classify_text(request):
         return f'Something is wrong with request json. :('
 
     def preprocess_text(text):
-        text = sent_tokenize(email)
+        text = sent_tokenize(text)
         out = []
+        final_text = ""
         for sentence in text:
             if type(sentence) == str:
                 # clean text
                 clean = preprocess.clean(sentence)
                 # clean info
                 clean = preprocess.clean_info(clean)
-
                 out.append(clean)
             else:
                 out.append("")
         return out
     
+    sentences = preprocess_text(email_text)
+
     print("load fasttext model")
-    # email_text = preprocess_text(email_text)
     ft_model = fasttext.load_model("models/best_ft_model.bin")
-    sentences = sent_tokenize(email_text)
     res_dict = {"full_text": email_text}
     reqs = []
     certs = []
