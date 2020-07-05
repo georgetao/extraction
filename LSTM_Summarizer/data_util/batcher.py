@@ -111,9 +111,13 @@ class TaskExample(Example):
     self.enc_input = self.doc2ids(context, vocab) + self.doc2ids(task, vocab) #;OOVs are represented by the id for UNK token
     self.enc_seg = [SEGMENT['context'] for _ in context] + [SEGMENT['task'] for _ in task]
 
-    # words:     'the', 'papers' 'are' 'wet' '.' 'dry' 'the papers' '.'
-    # enc_input:   4      709      55   90   34    37    4   709    34
-    # enc_seg:     0       0       0    0    0     1     1    1     1
+    # words:     'the', 'papers' 'are' 'wet' '.' 'dry' 'the papers' '.' [PAD] [PAD]
+    # enc_input:   4      709      55   90   34    37    4   709    34    0     0
+    # enc_seg:     0       0       0    0    0     1     1    1     1     2     2
+
+    # p_gen = ...
+    # p_point_task
+    # p_point_context
 
     # If using pointer-generator mode, we need to store some extra info
     # Store a version of the enc_input where in-article OOVs are represented by their temporary OOV id; also store the in-article OOVs words themselves

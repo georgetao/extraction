@@ -21,7 +21,7 @@ function summarize() {
 	    method: 'post',
 	    headers: {
 	      'Accept': 'application/json',
-          'Content-Type': 'application/json'
+        'Content-Type': 'application/json'
 	    },
 	    body: JSON.stringify({"message": email_text})
 	  })

@@ -21,17 +21,17 @@ def get_cuda(tensor):
     return tensor
 
 class Evaluate(object):
-    def __init__(self, vocab, batcher, opt, model):
+    def __init__(self, vocab, batcher, model, model_path):
         self.vocab = vocab
         self.batcher = batcher
-        self.opt = opt
-        time.sleep(5)
+        self.model_path = model_path
+        time.sleep(1)
         self.setup_valid(model)
 
     def setup_valid(self, model):
         self.model = model(self.vocab.size())
         self.model = get_cuda(self.model)
-        checkpoint = T.load(os.path.join(config.save_model_path, self.opt.load_model))
+        checkpoint = T.load(os.path.join(config.save_model_path, self.model_path))
         self.model.load_state_dict(checkpoint["model_dict"])
 
 
@@ -99,8 +99,8 @@ class Evaluate(object):
 
 
 class TaskEvaluate(Evaluate):
-    def __init__(self, vocab, batcher, opt, model):
-        super().__init__(vocab, batcher, opt, model)
+    def __init__(self, vocab, batcher, model, model_path):
+        super().__init__(vocab, batcher, model, model_path)
 
     def evaluate_batch(self):
         batch = self.batcher.next_batch()
@@ -148,7 +148,7 @@ class TaskEvaluate(Evaluate):
 
             batch = self.batcher.next_batch()
 
-        load_file = self.opt.load_model
+        # load_file = self.opt.load_model
 
         # if print_sents:
         #     self.print_original_predicted(decoded_sents, ref_sents, article_sents, load_file)
