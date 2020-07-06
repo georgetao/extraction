@@ -79,7 +79,6 @@ function start () {
 	summarize(email_text);
 }
 
-
 //Summarize also adds tasks to the to_do_list
 function summarize(email_text) {
 
@@ -157,3 +156,21 @@ document.getElementById('clickMe').addEventListener('click', start);
 
 // var email_text = getMessage(user_id,gmail_id);
 // console.log(email_text);
+
+
+// function getMessage() {
+// 	var request = gapi.client.gmail.users.messages.get({
+// 		'userId': 'me',
+// 		'id': 'percivalchen@berkeley.edu'
+// 	});
+
+// 	request.execute(function(response) {
+// 		$.each(response.m$.each(response.messages, function() {
+//       var messageRequest = gapi.client.gmail.users.messages.get({
+//         'userId': 'me',
+//         'id': this.id
+//     })
+//       }));
+// }
+// );
+// };
