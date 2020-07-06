@@ -8,7 +8,7 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
 
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="nodes/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="styles.css">
    <!--  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> -->
   </head>
@@ -17,17 +17,17 @@
       <div class="row">
         <div class="col-12">
           <h3>Input Text:</h3>
-          <textarea id="myTextArea" name="myTextArea" rows="5" cols="30" placeholder="Paste Email Text Here"></textarea>
-          <a><button id="clickMe" class="dropbtn" >Extract</button></a>
+          <textarea id="myTextArea" name="myTextArea" rows="5" style="width:100%" placeholder="Paste Email Text Here"></textarea>
+          <a><button id="clickMe" class="btn btn-block" >Extract</button></a>
         </div>
       </div>
 
-      <div class="row">
+<!--       <div class="row">
         <div class="col-12">
           <h3>Answer</h3>
           <textarea id="answer" rows="3" cols="30" placeholder="Model Output Appears Here"></textarea>
         </div>
-      </div>
+      </div> -->
 
       <div class="row">
         <div class="col-12">
@@ -67,7 +67,7 @@
             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <img src="img/settings.png" alt="Settings">
             </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <div class="dropdown-menu dropdown-extraction" aria-labelledby="dropdownMenuButton">
               <a class="dropdown-item">Sender: George Tao</a>
               <a href="#" class="dropdown-item">Go to original e-mail.</a>
               <a href="#" class="dropdown-item">Mark as done.</a>
@@ -76,14 +76,13 @@
           </div>
         </div>
       </div>
-
     </div>
   </body>
 
     <!-- jQuery first, then Popper.js, then Bootstrap JS. -->
-  <script src="node_modules/jquery/dist/jquery.slim.min.js"></script>
-  <script src="node_modules/popper.js/dist/umd/popper.min.js"></script>
-  <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+  <script src="nodes/jquery/dist/jquery.slim.min.js"></script>
+  <script src="nodes/popper.js/dist/umd/popper.min.js"></script>
+  <script src="nodes/bootstrap/dist/js/bootstrap.min.js"></script>
   
   <script type="text/javascript" src="popup.js" defer></script>
 </html>

@@ -1,5 +1,5 @@
 body {
-	width: 205px; 
+	width: 600px; 
 	overflow:hidden;
   background-color: #252423;
   border-radius: 8px;
@@ -17,6 +17,10 @@ h3 {
   line-height: 1.75;
   color: white;
 }
+
+/*.dropdown-extraction {
+  padding:0px 50px 0px 0px;
+}*/
 
 button {
      background:none!important;
