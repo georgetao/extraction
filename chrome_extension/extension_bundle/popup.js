@@ -92,7 +92,7 @@ function summarize(email_text) {
 	  }
 	}
 
-	var cloud_fn_url = 'https://us-central1-sigma-smile-251401.cloudfunctions.net/classifier'
+	var cloud_fn_url = 'https://us-central1-sigma-smile-251401.cloudfunctions.net/classifier2'
 
 	console.log(cloud_fn_url)
 	
@@ -106,22 +106,20 @@ function summarize(email_text) {
 	  })
 	  .then(response => response.json())
 	  .then(function (data) {
-	    // alert(data)
-	    reqs = data["requests"]
-	    certs = data["certainty"]
-	    console.log(data["requests"])
-	    var results = [];
+	  	var results = [];
+	    for (i in data) {
+	    	results.push(data[i])
+	    }
+	 //    reqs = data["requests"]
+	 //    certs = data["certainty"]
 
+		// for (var i=0; i < reqs.length; i++) {
+		// 	var sentence = reqs[i]
+		// 	var certainty = certs[i]
+		// 	document.getElementById("answer").value += sentence + '\r\n' + '\r\n';
 
-	    // alert(reqs)
-	    // alert(certs)
-		for (var i=0; i < reqs.length; i++) {
-			var sentence = reqs[i]
-			var certainty = certs[i]
-			// document.getElementById("answer").value += sentence + '\r\n' + '\r\n';
-
-			results.push(sentence);
-		}
+		// 	results.push(sentence);
+		// }
 	    return results;
 	  })
 	  .then(function(data) {
