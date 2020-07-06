@@ -81,19 +81,18 @@ function start () {
 function summarize() {
 	// alert("sending request to cloud fn");
 
-	var gmail_id = document.querySelector('[data-message-id]').getAttribute('data-legacy-message-id');
-	var user_id = 'me';
+	// var gmail_id = document.querySelector('[data-message-id]').getAttribute('data-legacy-message-id');
+	// var user_id = 'me';
 
-	function getMessage(userId, messageId, callback) {
-	  var request = gapi.client.gmail.users.messages.get({
-	    'userId': userId,
-	    'id': messageId
-	  });
-	  request.execute(callback);
-	}
+	// function getMessage(userId, messageId, callback) {
+	//   var request = gapi.client.gmail.users.messages.get({
+	//     'userId': userId,
+	//     'id': messageId
+	//   });
+	//   request.execute(callback);
+	// }
 
-	// var email_text = document.getElementById("myTextArea").value
-	var email_text = getMessage(user_id, gmail_id)
+	var email_text = document.getElementById("myTextArea").value
 	console.log(email_text)
 
 	function status(response) {
@@ -151,22 +150,40 @@ document.getElementById('clickMe').addEventListener('click', start);
 // document.getElementById('clickMe').addEventListener('click', summarize);
 
 
-gapi.load('client:auth2', () => {
-    gapi.client.load('gmail', 'v1', () => {
-      console.log('Loaded Gmail');
-    });
-})
+// gapi.load('client:auth2', () => {
+//     gapi.client.load('gmail', 'v1', () => {
+//       console.log('Loaded Gmail');
+//     });
+// })
 
-var gmail_id = document.querySelector('[data-message-id]').getAttribute('data-legacy-message-id');
-var user_id = 'me';
+// var gmail_id = document.querySelector('[data-message-id]').getAttribute('data-legacy-message-id');
+// var user_id = 'me';
 
-function getMessage(userId, messageId, callback) {
-  var request = gapi.client.gmail.users.messages.get({
-    'userId': userId,
-    'id': messageId
-  });
-  request.execute(callback);
-}
+// function getMessage(userId, messageId, callback) {
+//   var request = gapi.client.gmail.users.messages.get({
+//     'userId': userId,
+//     'id': messageId
+//   });
+//   request.execute(callback);
+// }
 
-var email_text = getMessage(user_id,gmail_id);
-console.log(email_text);
+// var email_text = getMessage(user_id,gmail_id);
+// console.log(email_text);
+
+
+// function getMessage() {
+// 	var request = gapi.client.gmail.users.messages.get({
+// 		'userId': 'me',
+// 		'id': 'percivalchen@berkeley.edu'
+// 	});
+
+// 	request.execute(function(response) {
+// 		$.each(response.m$.each(response.messages, function() {
+//       var messageRequest = gapi.client.gmail.users.messages.get({
+//         'userId': 'me',
+//         'id': this.id
+//     })
+//       }));
+// }
+// );
+// };
