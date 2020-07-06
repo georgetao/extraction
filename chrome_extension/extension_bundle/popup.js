@@ -81,7 +81,20 @@ function start () {
 function summarize() {
 	// alert("sending request to cloud fn");
 
-	var email_text = document.getElementById("myTextArea").value
+	var gmail_id = document.querySelector('[data-message-id]').getAttribute('data-legacy-message-id');
+	var user_id = 'me';
+
+	function getMessage(userId, messageId, callback) {
+	  var request = gapi.client.gmail.users.messages.get({
+	    'userId': userId,
+	    'id': messageId
+	  });
+	  request.execute(callback);
+	}
+
+	// var email_text = document.getElementById("myTextArea").value
+	var email_text = getMessage(user_id, gmail_id)
+	console.log(email_text)
 
 	function status(response) {
 	  if (response.status >= 200 && response.status < 300) {
@@ -137,3 +150,23 @@ document.getElementById('clickMe').addEventListener('click', start);
 
 // document.getElementById('clickMe').addEventListener('click', summarize);
 
+
+gapi.load('client:auth2', () => {
+    gapi.client.load('gmail', 'v1', () => {
+      console.log('Loaded Gmail');
+    });
+})
+
+var gmail_id = document.querySelector('[data-message-id]').getAttribute('data-legacy-message-id');
+var user_id = 'me';
+
+function getMessage(userId, messageId, callback) {
+  var request = gapi.client.gmail.users.messages.get({
+    'userId': userId,
+    'id': messageId
+  });
+  request.execute(callback);
+}
+
+var email_text = getMessage(user_id,gmail_id);
+console.log(email_text);
