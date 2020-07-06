@@ -1,19 +1,23 @@
-// Currently takes an inputed text and classifies each sentence.
-// TODO: READ EMAILS INSTEAD OF INPUT TEXT.
-// TODO: INCORPORATE SUMMARIZATION MODEL.
-// TODO: ADD RESULT TO TODO LIST.
-
 //stage emails to be summarized
 function read_emails() {
-	console.log("read");
+	// alert("sending request to cloud fn");
+
+	// var gmail_id = document.querySelector('[data-message-id]').getAttribute('data-legacy-message-id');
+	// var user_id = 'me';
+
+	// function getMessage(userId, messageId, callback) {
+	//   var request = gapi.client.gmail.users.messages.get({
+	//     'userId': userId,
+	//     'id': messageId
+	//   });
+	//   request.execute(callback);
+	// }
+	// var email_text = getMessage(user_id, gmail_id)
+	// console.log(email_text)
+	return document.getElementById("myTextArea").value
 }
 
-//summarize and stage summarizations to be added to todo list.
-function pseudo_summarize() {
-	console.log("summarize");
-}
-
-//should take in string
+//should take in list of strings
 function add_to_todo(results) {
 	for (i in results) {
 		//ALL OF THIS IS JUST SETTING UP THE ENVIRONMENT
@@ -71,30 +75,13 @@ function add_to_todo(results) {
 }
 
 function start () {
-	read_emails();
-	pseudo_summarize();
-
-	summarize();
-	// add_to_todo(results);
+	var email_text = read_emails();
+	summarize(email_text);
 }
 
-function summarize() {
-	// alert("sending request to cloud fn");
 
-	var gmail_id = document.querySelector('[data-message-id]').getAttribute('data-legacy-message-id');
-	var user_id = 'me';
-
-	function getMessage(userId, messageId, callback) {
-	  var request = gapi.client.gmail.users.messages.get({
-	    'userId': userId,
-	    'id': messageId
-	  });
-	  request.execute(callback);
-	}
-
-	// var email_text = document.getElementById("myTextArea").value
-	var email_text = getMessage(user_id, gmail_id)
-	console.log(email_text)
+//Summarize also adds tasks to the to_do_list
+function summarize(email_text) {
 
 	function status(response) {
 	  if (response.status >= 200 && response.status < 300) {
@@ -151,22 +138,22 @@ document.getElementById('clickMe').addEventListener('click', start);
 // document.getElementById('clickMe').addEventListener('click', summarize);
 
 
-gapi.load('client:auth2', () => {
-    gapi.client.load('gmail', 'v1', () => {
-      console.log('Loaded Gmail');
-    });
-})
+// gapi.load('client:auth2', () => {
+//     gapi.client.load('gmail', 'v1', () => {
+//       console.log('Loaded Gmail');
+//     });
+// })
 
-var gmail_id = document.querySelector('[data-message-id]').getAttribute('data-legacy-message-id');
-var user_id = 'me';
+// var gmail_id = document.querySelector('[data-message-id]').getAttribute('data-legacy-message-id');
+// var user_id = 'me';
 
-function getMessage(userId, messageId, callback) {
-  var request = gapi.client.gmail.users.messages.get({
-    'userId': userId,
-    'id': messageId
-  });
-  request.execute(callback);
-}
+// function getMessage(userId, messageId, callback) {
+//   var request = gapi.client.gmail.users.messages.get({
+//     'userId': userId,
+//     'id': messageId
+//   });
+//   request.execute(callback);
+// }
 
-var email_text = getMessage(user_id,gmail_id);
-console.log(email_text);
+// var email_text = getMessage(user_id,gmail_id);
+// console.log(email_text);
