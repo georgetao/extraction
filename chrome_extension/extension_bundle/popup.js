@@ -32,10 +32,10 @@ function add_to_todo(results) {
 		col2_div.appendChild(dropdown_div);
 
 		row_div.className += "row";
-		col1_div.className += "col-10";
+		col1_div.className += "col-8";
 		col2_div.className += "col-2";
 		dropdown_div.className += "dropdown";
-		dropdown_menu_div.className += "dropdown-menu"
+		dropdown_menu_div.className += "dropdown-menu dropdown-menu-right"
 		dropdown_menu_div.setAttribute("aria-labelledby", "dropdownMenuButton");
 
 		//TEXT GOES HERE
@@ -59,7 +59,7 @@ function add_to_todo(results) {
 
 
 		//DROPDOWN LINKS
-		var options = ["Sender: George Tao", "Go to Original E-mail", "Mark as Read", "Mark as Spam"];
+		var options = ["Sender: George Tao", "Go to Original E-mail", "Mark as Done", "Mark as Spam"];
 		var links =["#", "#", "#", "#"];
 		for (var i=0; i<options.length; i++){
 			var option = document.createElement("a");
