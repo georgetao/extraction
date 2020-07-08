@@ -3,7 +3,7 @@
 # imports
 import re
 import numpy as np
-from nltk.tokenize import sent_tokenize, word_tokenize
+# from nltk.tokenize import sent_tokenize, word_tokenize
 
 # Regexes
 HTML = r'</?\w+/?>|>|<'

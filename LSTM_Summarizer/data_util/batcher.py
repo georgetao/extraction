@@ -6,7 +6,7 @@ from random import shuffle
 from threading import Thread
 
 import numpy as np
-import tensorflow as tf
+# import tensorflow as tf
 
 from . import config
 from . import data
@@ -111,13 +111,9 @@ class TaskExample(Example):
     self.enc_input = self.doc2ids(context, vocab) + self.doc2ids(task, vocab) #;OOVs are represented by the id for UNK token
     self.enc_seg = [SEGMENT['context'] for _ in context] + [SEGMENT['task'] for _ in task]
 
-    # words:     'the', 'papers' 'are' 'wet' '.' 'dry' 'the papers' '.' [PAD] [PAD]
-    # enc_input:   4      709      55   90   34    37    4   709    34    0     0
-    # enc_seg:     0       0       0    0    0     1     1    1     1     2     2
-
-    # p_gen = ...
-    # p_point_task
-    # p_point_context
+    # words:     'the', 'papers' 'are' 'wet' '.' 'dry' 'the papers' '.'
+    # enc_input:   4      709      55   90   34    37    4   709    34
+    # enc_seg:     0       0       0    0    0     1     1    1     1
 
     # If using pointer-generator mode, we need to store some extra info
     # Store a version of the enc_input where in-article OOVs are represented by their temporary OOV id; also store the in-article OOVs words themselves
@@ -318,10 +314,10 @@ class Batcher(object):
   def next_batch(self):
     # If the batch queue is empty, print a warning
     if self._batch_queue.qsize() == 0:
-      # tf.compat.v1.logging.warning('Bucket input queue is empty when calling next_batch. Bucket queue size: %i, Input queue size: %i', self._batch_queue.qsize(), self._example_queue.qsize())
+      # #tf.compat.v1.logging.warning('Bucket input queue is empty when calling next_batch. Bucket queue size: %i, Input queue size: %i', self._batch_queue.qsize(), self._example_queue.qsize())
       # if self._single_pass and self._finished_reading:
       if self._single_pass:
-        tf.compat.v1.logging.info("Finished reading dataset in single_pass mode.")
+        #tf.compat.v1.logging.info("Finished reading dataset in single_pass mode.")
         return None
 
     batch = self._batch_queue.get() # get the next Batch
@@ -336,9 +332,9 @@ class Batcher(object):
         # print('ARTICLE:', abstract)
         # print(30*'=')
       except StopIteration: # if there are no more examples:
-        tf.compat.v1.logging.info("The example generator for this example queue filling thread has exhausted data.")
+        #tf.compat.v1.logging.info("The example generator for this example queue filling thread has exhausted data.")
         if self._single_pass:
-          tf.compat.v1.logging.info("single_pass mode is on, so we've finished reading dataset. This thread is stopping.")
+          #tf.compat.v1.logging.info("single_pass mode is on, so we've finished reading dataset. This thread is stopping.")
           self._finished_reading = True
           break
         else:
@@ -374,22 +370,22 @@ class Batcher(object):
 
   def watch_threads(self):
     while True:
-      tf.compat.v1.logging.info(
-        'Bucket queue size: %i, Input queue size: %i',
-        self._batch_queue.qsize(), self._example_queue.qsize())
+      #tf.compat.v1.logging.info(
+        # 'Bucket queue size: %i, Input queue size: %i',
+        # self._batch_queue.qsize(), self._example_queue.qsize())
 
       time.sleep(60)
 
       for idx,t in enumerate(self._example_q_threads):
         if not t.is_alive(): # if the thread is dead
-          tf.compat.v1.logging.error('Found example queue thread dead. Restarting.')
+          #tf.compat.v1.logging.error('Found example queue thread dead. Restarting.')
           new_t = Thread(target=self.fill_example_queue)
           self._example_q_threads[idx] = new_t
           new_t.daemon = True
           new_t.start()
       for idx,t in enumerate(self._batch_q_threads):
         if not t.is_alive(): # if the thread is dead
-          tf.compat.v1.logging.error('Found batch queue thread dead. Restarting.')
+          #tf.compat.v1.logging.error('Found batch queue thread dead. Restarting.')
           new_t = Thread(target=self.fill_batch_queue)
           self._batch_q_threads[idx] = new_t
           new_t.daemon = True
@@ -398,16 +394,16 @@ class Batcher(object):
 
   def text_generator(self, example_generator):
     while True:
-      e = next(example_generator) # e is a tf.Example
+      e = next(example_generator) # e is a #tf.Example
       try:
         article_text, abstract_text = e
         # article_text = article_text.decode()
         # abstract_text = abstract_text.decode()    
       except ValueError:
-        tf.compat.v1.logging.error('Failed to get article or abstract from example')
+        #tf.compat.v1.logging.error('Failed to get article or abstract from example')
         continue
       if len(article_text)==0: # See https://github.com/abisee/pointer-generator/issues/1
-        #tf.compat.v1.logging.warning('Found an example with empty article text. Skipping it.')
+        ##tf.compat.v1.logging.warning('Found an example with empty article text. Skipping it.')
         continue
       else:
         yield (article_text, abstract_text)
@@ -432,9 +428,9 @@ class TaskBatcher(Batcher):
         # print('SUMMARY:', summary)
         # print(30*'=')
       except StopIteration: # if there are no more examples:
-        tf.compat.v1.logging.info("The example generator for this example queue filling thread has exhausted data.")
+        #tf.compat.v1.logging.info("The example generator for this example queue filling thread has exhausted data.")
         if self._single_pass:
-          tf.compat.v1.logging.info("single_pass mode is on, so we've finished reading dataset. This thread is stopping.")
+          #tf.compat.v1.logging.info("single_pass mode is on, so we've finished reading dataset. This thread is stopping.")
           self._finished_reading = True
           break
         else:
@@ -449,12 +445,15 @@ class TaskBatcher(Batcher):
       try:
         context = example[CONT_KEY]
         task    = example[TASK_KEY]
-        summary = example[SUM_KEY] 
+        if SUM_KEY in example: #temporary fix
+          summary = example[SUM_KEY]
+        else: 
+          summary = " " # 1 space summary if summary is absent
       except ValueError:
-        tf.compat.v1.logging.error('Failed to get context, task or abstract from example')
+        #tf.compat.v1.logging.error('Failed to get context, task or abstract from example')
         continue
       if len(task)==0 or len(summary) == 0: 
-        tf.compat.v1.logging.warning('Found an example with empty article text. Skipping it.')
+        #tf.compat.v1.logging.warning('Found an example with empty article text. Skipping it.')
         continue
       else:
         yield context, task, summary       

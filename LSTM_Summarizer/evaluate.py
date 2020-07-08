@@ -12,8 +12,8 @@ from data_util.batcher import Batcher
 from data_util.data import Vocab
 from train_util import *
 from beam_search import *
-from rouge import Rouge
-import argparse
+# from rouge import Rouge
+# import argparse
 
 def get_cuda(tensor):
     if T.cuda.is_available():
@@ -31,7 +31,7 @@ class Evaluate(object):
     def setup_valid(self, model):
         self.model = model(self.vocab.size())
         self.model = get_cuda(self.model)
-        checkpoint = T.load(os.path.join(config.save_model_path, self.model_path))
+        checkpoint = T.load(self.model_path)
         self.model.load_state_dict(checkpoint["model_dict"])
 
 
@@ -111,7 +111,7 @@ class TaskEvaluate(Evaluate):
         ref_sents = []
         task_sents = []
         context_sents = []
-        rouge = Rouge()
+        
         while batch is not None:
             enc_batch, enc_seg_batch, enc_lens, enc_padding_mask, enc_batch_extend_vocab, extra_zeros, ct_e = get_enc_seg_data(batch)
             
@@ -145,34 +145,7 @@ class TaskEvaluate(Evaluate):
                 task_sents.append(batch.original_tasks[i])
                 context_sents.append(batch.original_contexts[i])
 
-
             batch = self.batcher.next_batch()
-
-        # load_file = self.opt.load_model
-
-        # if print_sents:
-        #     self.print_original_predicted(decoded_sents, ref_sents, article_sents, load_file)
-
-        # scores = rouge.get_scores(decoded_sents, ref_sents, avg = True)
         
         return decoded_sents, ref_sents, task_sents, context_sents
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--task", type=str, default="validate", choices=["validate","test"])
-    parser.add_argument("--start_from", type=str, default="0020000.tar")
-    parser.add_argument("--load_model", type=str, default=None)
-    opt = parser.parse_args()
-
-    if opt.task == "validate":
-        saved_models = os.listdir(config.save_model_path)
-        saved_models.sort()
-        file_idx = saved_models.index(opt.start_from)
-        saved_models = saved_models[file_idx:]
-        for f in saved_models:
-            opt.load_model = f
-            eval_processor = Evaluate(config.valid_data_path, opt)
-            eval_processor.evaluate_batch()
-    else:   #test
-        eval_processor = Evaluate(config.test_data_path, opt)
-        eval_processor.evaluate_batch()

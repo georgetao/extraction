@@ -16,7 +16,7 @@ class Summarizer:
     #Maybe if batch is too big (>200?), separate into more batches
 
     def summarize(self, examples):
-        batcher = TaskBatcher(
+        batcher = TaskBatcher( # Batching obj
             examples=examples,
             vocab=self.vocab, 
             mode='train', 

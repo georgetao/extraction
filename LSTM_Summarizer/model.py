@@ -5,16 +5,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 
-from transformers import BertModel, BertConfig
-
 from train_util import get_cuda
 from data_util import config
-from data_util.data import bert_name, bert_tokenizer
 from data_util.batcher import SEGMENT
-
-# bert config
-bert_config = BertConfig()
-bert_config.output_hidden_states = True
 
 
 def init_lstm_wt(lstm):
@@ -37,51 +30,6 @@ def init_linear_wt(linear):
 
 def init_wt_normal(wt):
     wt.data.normal_(std=config.trunc_norm_init_std)
-
-
-class BertEncoder(nn.Module):
-    def __init__(self):
-        super(BertEncoder, self).__init__()
-
-        self.bert = BertModel.from_pretrained(bert_name, config=bert_config)
-
-        self.reduce_h = nn.Linear(bert_config.hidden_size * 2, bert_config.hidden_size)
-        self.reduce_c = nn.Linear(bert_config.hidden_size * 2, bert_config.hidden_size)
-
-        # initialize weights
-        init_linear_wt(self.reduce_h)
-        init_linear_wt(self.reduce_c)
-
-    def forward(self, x, seq_lens):
-        packed = pack_padded_sequence(x, seq_lens, batch_first=True)
-        enc_out, enc_hid = self.bert(packed.data)
-        enc_out = enc_out.contiguous()                              #bs, n_seq, 2*n_hid
-        h, c = enc_hid                                              #shape of h: 2, bs, n_hid
-        h = T.cat(list(h), dim=1)                                   #bs, 2*n_hid
-        c = T.cat(list(c), dim=1)
-        h_reduced = F.relu(self.reduce_h(h))                        #bs,n_hid
-        c_reduced = F.relu(self.reduce_c(c))
-        return enc_out, (h_reduced, c_reduced)
-
-
-class BertEmbedder(nn.Module):
-    def __init__(self):
-        super(BertEmbedder, self).__init__()
-        self.bert = BertModel.from_pretrained(bert_name, config=bert_config)
-        self.bert.resize_token_embeddings(len(bert_tokenizer))
-        self.reduce = nn.Linear(bert_config.hidden_size, config.emb_dim)
-        init_linear_wt(self.reduce)
-
-    def forward(self, x):
-        # Check shape of x
-        if len(x.shape) < 2:
-            x = x.unsqueeze(0)
-        assert len(x.shape) == 2, 'Tensor has more than 2 dimensions'
-
-        # encode
-        enc_hid, _, _ = self.bert(x)
-        reduced_enc_hid = self.reduce(enc_hid)
-        return reduced_enc_hid
 
 
 class Encoder(nn.Module):
@@ -118,31 +66,6 @@ class TaskEncoder(Encoder):
         init_linear_wt(self.reduce_h)
         self.reduce_c = nn.Linear(config.hidden_dim * 2, config.hidden_dim)
         init_linear_wt(self.reduce_c)
-
-
-class PostBertEncoder(nn.Module):
-    def __init__(self, emb_dim, hidden_dim):
-        super(PostBertEncoder, self).__init__()
-
-        self.lstm = nn.LSTM(emb_dim, hidden_dim, num_layers=1, batch_first=True, bidirectional=True)
-        init_lstm_wt(self.lstm)
-
-        self.reduce_h = nn.Linear(hidden_dim * 2, hidden_dim)
-        init_linear_wt(self.reduce_h)
-        self.reduce_c = nn.Linear(hidden_dim * 2, hidden_dim)
-        init_linear_wt(self.reduce_c)
-
-    def forward(self, x, seq_lens):
-        packed = pack_padded_sequence(x, seq_lens, batch_first=True)
-        enc_out, enc_hid = self.lstm(packed)
-        enc_out,_ = pad_packed_sequence(enc_out, batch_first=True)
-        enc_out = enc_out.contiguous()                              #bs, n_seq, 2*n_hid
-        h, c = enc_hid                                              #shape of h: 2, bs, n_hid
-        h = T.cat(list(h), dim=1)                                   #bs, 2*n_hid
-        c = T.cat(list(c), dim=1)
-        h_reduced = F.relu(self.reduce_h(h))                        #bs,n_hid
-        c_reduced = F.relu(self.reduce_c(c))
-        return enc_out, (h_reduced, c_reduced)
 
 
 class encoder_attention(nn.Module):
@@ -307,26 +230,6 @@ class TaskModel(nn.Module):
         self.embeds.load_state_dict(T.load(os.path.join(config.save_embedding_path, file)))
         if fix:
             self.embeds.weight.requires_grad = False
-
-class BertSumModel(nn.Module):
-    def __init__(self):
-        super(BertSumModel, self).__init__()
-        self.encoder = BertEncoder()
-        self.decoder = Decoder()
-        self.encoder = get_cuda(self.encoder)
-        self.decoder = get_cuda(self.decoder)
-
-
-class BertSummarizer(nn.Module):
-    def __init__(self):
-        super(BertSummarizer, self).__init__()
-        self.embeds = BertEmbedder()
-        self.encoder = Encoder()
-        self.decoder = Decoder()
-
-        self.encoder = get_cuda(self.encoder)
-        self.decoder = get_cuda(self.decoder)
-        self.embeds = get_cuda(self.embeds)
 
 
 

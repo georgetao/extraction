@@ -1,12 +1,11 @@
 #Most of this file is copied form https://github.com/abisee/pointer-generator/blob/master/data.py
 
-import glob
-import random
-import struct
-import csv
-import pandas as pd
-from tensorflow.core.example import example_pb2
-from transformers import BertTokenizer
+# import glob
+# import random
+# import struct
+# import csv
+# import pandas as pd
+# from tensorflow.core.example import example_pb2
 
 from data_util.preprocess import *
 
@@ -21,15 +20,6 @@ START_DECODING = '[START]' # This has a vocab id, which is used at the start of 
 STOP_DECODING = '[STOP]' # This has a vocab id, which is used at the end of untruncated target sequences
 
 # Note: none of <s>, </s>, [PAD], [UNK], [START], [STOP] should appear in the vocab file.
-
-bert_name = 'bert-base-uncased'
-
-# Create the Bert Tokenizer
-bert_tokenizer = BertTokenizer.from_pretrained(bert_name)
-# Update 
-for u,t in zip(['[unused0]', '[unused1]'], [START_DECODING, STOP_DECODING]):
-    bert_tokenizer.vocab[t] = bert_tokenizer.vocab[u]
-    bert_tokenizer.vocab.pop(u)
 
 
 class Vocab(object):
@@ -79,14 +69,6 @@ class Vocab(object):
 
   def size(self):
     return self._count
-
-
-class BertVocab(Vocab):
-  def __init__(self):
-    self.tokenizer = bert_tokenizer
-    self._word_to_id = self.tokenizer.vocab
-    self._id_to_word = self.tokenizer.ids_to_tokens
-    self._count = self.tokenizer.vocab_size
 
 
 def example_generator(example_list, single_pass):

@@ -1,26 +1,24 @@
 import os
 import sys
-from data_util import config 
+import json
+import urllib.request
+from google.cloud import storage
+
 from summarizer import *
 
-# from google.cloud import storage
-# sys.path.append(os.path.abspath('models'))
+# Fetch model
+model_file = '/tmp/model.tar'
+storage_client = storage.Client()
+bucket = storage_client.get_bucket('extraction_bucket_1')
+blob = bucket.blob('saved_models/0000360.tar')
+blob.download_to_filename(model_file)
 
-
-summarizer  = Summarizer(
-  vocab_path = os.path.join(config.log_root, 'data/vocab/vocab.txt'),
-  model_path = os.path.join(config.log_root, "data/saved_models_2/0000360.tar"),
-  model = TaskModel
-)
-
+# Create Summarizer
+summarizer  = Summarizer(vocab_path = 'vocab.txt', model_path = model_file, model = TaskModel)
 
 def summarize(request):
   request_json = request.get_json(silent=True)
-  contains_keys = [k in request_json for k in [CONT_KEY, TASK_KEY, SUM_KEY]]
-  if not contains_keys:
-    return 'request json missing necessary keys :('
+  if "examples" not in request_json:
+    return "request json missing key: examples"
 
-  decoded = summarizer.summarize([request])
-  return {'summary': decoded}
-
-
+  return json.dumps(summarizer.summarize(request_json["examples"]))
