@@ -5,7 +5,7 @@ log_root = "/Users/rowancassius/Desktop/capstone/LSTM_Summarizer"
 sum_path        =  os.path.join(log_root, "data/sum")
 vocab_path      =  os.path.join(log_root, "data/vocab")
 embed_path      =  os.path.join(log_root, "data/embeddings")  
-save_model_path =  os.path.join(log_root, "data/saved_models")  
+# save_model_path =  os.path.join(log_root, "data/saved_models")  
 
 # Hyperparameters
 hidden_dim = 512
