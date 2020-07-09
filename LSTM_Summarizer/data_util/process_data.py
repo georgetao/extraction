@@ -3,39 +3,94 @@ import os
 import time
 import numpy as np
 import pandas as pd
+from nltk.tokenize import sent_tokenize
 
-from data_util import config
+import config
 from preprocess import *
+from helper import parallel_map
+
+# set random seed
+np.random.seed(111)
 
 
 # Constants
-data_path = os.path.join(config.log_root, config.sum_path)
 pr = '_processed'
 tsv = '.tsv'
 
-def process_data(filenames, col_func):
-  for name in filenames:
-    df = pd.read_csv(os.path.join(data_path, name + tsv), sep='\t')
-    df.replace(np.nan, '', inplace=True)
-    for col, func in col_func.items(): 
+HEAD = 'headline'
+TXT = 'text'
+
+CONT_KEY = 'Context'
+TASK_KEY = 'TaskSentence'
+SUM_KEY = 'Summary'
+COLS = [CONT_KEY, TASK_KEY, SUM_KEY]
+
+col_func_map = {
+  SUM_KEY:  summary_process_text, 
+  CONT_KEY: article_process_text,
+  TASK_KEY: article_process_text
+}
+
+def process_data(df, col_func, parallel=True): 
+  for col, func in col_func.items():
+    if parallel:
+      df[col] = parallel_map(df[col].tolist(), func)
+    else:
       df[col] = df[col].map(func)
-    df.to_csv(os.path.join(data_path, name + pr + tsv))
+  return df
+
+def split_task_data(df):
+  # shuffle
+  df = df.sample(frac=1)
+  ts = int(.2 * df.shape[0]) # test size
+  vs = 300                   # val size
+  # split
+  val = df[:vs]
+  test = df[vs:(ts+vs)]
+  train = df[(ts+vs):]
+  # write
+  for d,n in zip([train, test, val], ['_train', '_test','_val']):
+    d.to_csv(os.path.join(config.sum_path, 'task' + n + tsv), sep='\t', index=False)
+
+def split_wiki_data(df):
+  # shuffle
+  df = df.sample(frac=1)
+  vs = 300
+  # split
+  val = df[:vs]
+  train = df[vs:]
+  # write
+  for d,n in zip([train, val], ['_train', '_val']):
+    d.to_csv(os.path.join(config.sum_path, 'wiki' + n + tsv), sep='\t', index=False)
+
+def split_wiki_text(text):
+    sents = sent_tokenize(text)
+    task_ = sents[-1]
+    context_ = ' '.join(sents[:-1])
+    return [task_, context_]
+
+def process_wiki_data(df):
+  df.rename(columns={HEAD: SUM_KEY}, inplace=True)
+  df_ct = pd.DataFrame(df[TXT].map(split_wiki_text).tolist(), columns=[TASK_KEY, CONT_KEY])
+  df = df[[SUM_KEY]].join(df_ct)
+  return df
 
 def main():
   start  = time.time()
-  # process task data
-  process_data(
-    filenames=['task_train', 'task_test', 'task_val'],
-    col_func={
-      'Summary': summary_process_text, 
-      'Context': article_process_text,
-      'TaskSentence': article_process_text}
-  )
-  # process wiki data
-  process_data(
-    filenames=['wiki_train', 'wiki_val'],
-    col_func={'headline': summary_process_text, 'text': article_process_text}
-  )
+
+  # process / split task data
+  task = pd.read_csv(os.path.join(config.sum_path, 'task.tsv'), sep='\t')
+  task = task.replace(np.nan, '')
+  task = process_data(task[COLS], col_func_map)
+  split_task_data(task)
+
+  # process / split wikihow data
+  wiki = pd.read_csv(os.path.join(config.sum_path, 'wiki.tsv'), sep='\t')
+  wiki = wiki.dropna()
+  wiki = process_wiki_data(wiki)
+  wiki = process_data(wiki, col_func_map)
+  split_wiki_data(wiki)
+
   end = time.time()
   elapsed = end - start
   print(f'SUCCESS. Finished in {round(elapsed/60,2)} minutes.')

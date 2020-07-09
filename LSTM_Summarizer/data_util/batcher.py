@@ -94,7 +94,8 @@ class TaskExample(Example):
     stop_decoding = vocab.word2id(data.STOP_DECODING)
 
     # Process the context and the task
-    context, task = nlp(context), nlp(task)
+    context = nlp(article_process_text(context))
+    task    = nlp(article_process_text(task))
     self.entity_label_map = {**{e.text: e.label_ for e in context.ents}, 
                              **{e.text: e.label_ for e in task.ents}}
     
@@ -123,7 +124,7 @@ class TaskExample(Example):
 
     # Process the summary
     # Get a verison of the reference summary where in-article OOVs are represented by their temporary article OOV id
-    sum_ids, sum_ids_extend_vocab = self.summary2ids_(summary, vocab)
+    sum_ids, sum_ids_extend_vocab = self.summary2ids_(summary_process_text(summary), vocab)
 
     # Get the decoder input sequence and target sequence
     self.dec_input, _ = self.get_dec_inp_targ_seqs(sum_ids, config.max_dec_steps, start_decoding, stop_decoding)
