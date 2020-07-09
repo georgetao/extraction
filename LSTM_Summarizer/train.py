@@ -17,10 +17,15 @@ from rouge import Rouge
 from numpy import random
 import argparse
 
+# set seed
 random.seed(123)
 T.manual_seed(123)
 if T.cuda.is_available():
     T.cuda.manual_seed_all(123)
+
+class Namespace:
+    def __init__(self, **kwargs):
+        self.__dict__.update(kwargs)
 
 class Train(object):
     def __init__(self, vocab, batcher, opt, model, val_batcher=None): 

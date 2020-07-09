@@ -118,14 +118,20 @@ from collections import OrderedDict
 
 # Regexes
 BAD_20 = r'\b20\b'
-ANYSPACE = '[\t\n\s]'
+ANYSPACE = r'[\t\n\s]'
 SENDER = 'SENDER'
-ENRON = r'\b(Enron|enron|ENRON)\b'
-EMAIL_WORD = r'\b[Ee]\s?-?\s?[Mm][Aa][Ii][Ll]\b'
-ERASE = BAD_20 + '|' + BLACK
-BLACK_NO_PER = "[^A-Za-z0-9\s\?!,';:/\-@*%#~&]+"
+# ENRON = r'\b(Enron|enron|ENRON)\b'
+ENRON = re.compile(r'\benron\b', re.IGNORECASE)
+EMAIL_WORD = re.compile(r'\be\s?-?\s?mail\b', re.IGNORECASE)
+ASAP = re.compile(r'\b' + r'\s?\.?\s?'.join('asap') + r'\.?', re.IGNORECASE)
+RSVP = re.compile(r'\b' + r'\s?\.?\s?'.join('rsvp') + r'\.?', re.IGNORECASE)
+NL = r'\n+'
+EDGE_NL = r'(^\n+|\n+$)'
+ERASE = '|'.join([BLACK, BAD_20, EDGE_NL])
+BLACK_NO_PER = r"[^A-Za-z0-9\s\?!,';:/\-@*%#~&]+"
 EXT_PER = r'[\.\?\!,]\.' # extra period
 ext_per_repl = lambda match: match.group()[0]   # extra period fixer
+
 
 # Constants
 CAP_WORDS = {'I'}
@@ -190,15 +196,9 @@ def article_process_text(text):
 
 def summary_process_text(text):
     text = lower_first_token(text)
-    text =  core_process_text(text, BLACK_NO_PER)
+    text =  core_process_text(text, BLACK_NO_PER + '|' + EDGE_NL)
     tokens = [t.text if t.ent_type_ else t.text.lower() for t in nlp(text)]
     text = ' '.join(tokens)
-    # try:
-    #     tokens = [t.text if t.ent_type_ else t.text.lower() for t in nlp(text)]
-    #     text = ' '.join(tokens)
-    # except:
-    #     print('failed', text)
-    
     return text
 
 def vocab_process_text(text):
@@ -208,9 +208,13 @@ def vocab_process_text(text):
     return text
 
 def core_process_text(text, ERASE):
+    text = str(text)
+    text = re.sub(EXT_PER, ext_per_repl, text)
+    text = re.sub(NL, '\n', text)
     text = re.sub(ERASE, '', text) 
     text = re.sub(EMAIL_WORD, 'email', text)
-    text = re.sub(EXT_PER, ext_per_repl, text)
+    text = re.sub(ASAP, 'asap', text)
+    text = re.sub(RSVP, 'rsvp', text)
     return text
 
 def custom_ents(doc):

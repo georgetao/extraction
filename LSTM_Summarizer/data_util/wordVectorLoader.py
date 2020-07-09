@@ -5,11 +5,12 @@ import pandas as pd
 import torch as T
 
 import os
-import csv
 import timeit
 import datetime
 
-from data_util.config import rand_unif_init_mag
+from data_util.data import Vocab
+from data_util.config import vocab_path, embed_path, rand_unif_init_mag
+
 
 class WordVectorLoader:
 
@@ -61,7 +62,23 @@ class WordVectorLoader:
 
         self.embed_mat = embed_mat
 
+
     def save_embed_mat(self, save_path):
         file = os.path.join(save_path, f"embedding_{self.embed_mat.shape[0]}_{self.embed_dim}.tar")
         T.save({'weight': T.Tensor(self.embed_mat)}, file)
         print('model saved at: \n', file)
+
+
+# File names
+embeddings_file_name = '/Users/rowancassius/Desktop/glove.6B/glove.6B.200d.txt'
+
+def main():
+    vocab_file = os.path.join(vocab_path, 'vocab3.txt')
+    vocab = Vocab(vocab_file)
+    loader = WordVectorLoader(embed_dim=200)
+    loader.create_embedding_matrix(embeddings_file_name, vocab._word_to_id)
+    loader.save_embed_mat(embed_path)
+
+if __name__ == "__main__":
+    main()
+

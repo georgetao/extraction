@@ -1,11 +1,11 @@
+import os
 
-log_root = "/Users/rowancassius/Desktop/task-summarizer"
+log_root = "/Users/rowancassius/Desktop/capstone/LSTM_Summarizer"
 
-train_data_path = 	"data/chunked/train/train_*"
-valid_data_path = 	"data/chunked/valid/valid_*"
-test_data_path  = 	"data/chunked/test/test_*"
-vocab_path      = 		"data/vocab"
-
+sum_path        =  os.path.join(log_root, "data/sum")
+vocab_path      =  os.path.join(log_root, "data/vocab")
+embed_path      =  os.path.join(log_root, "data/embeddings")  
+save_model_path =  os.path.join(log_root, "data/saved_models")  
 
 # Hyperparameters
 hidden_dim = 512
