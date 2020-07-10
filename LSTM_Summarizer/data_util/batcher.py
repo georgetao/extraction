@@ -94,8 +94,7 @@ class TaskExample(Example):
     stop_decoding = vocab.word2id(data.STOP_DECODING)
 
     # Process the context and the task
-    context = nlp(article_process_text(context))
-    task    = nlp(article_process_text(task))
+    context, task = nlp(context), nlp(task)
     self.entity_label_map = {**{e.text: e.label_ for e in context.ents}, 
                              **{e.text: e.label_ for e in task.ents}}
     
@@ -124,7 +123,7 @@ class TaskExample(Example):
 
     # Process the summary
     # Get a verison of the reference summary where in-article OOVs are represented by their temporary article OOV id
-    sum_ids, sum_ids_extend_vocab = self.summary2ids_(summary_process_text(summary), vocab)
+    sum_ids, sum_ids_extend_vocab = self.summary2ids_(summary, vocab)
 
     # Get the decoder input sequence and target sequence
     self.dec_input, _ = self.get_dec_inp_targ_seqs(sum_ids, config.max_dec_steps, start_decoding, stop_decoding)
@@ -328,7 +327,7 @@ class Batcher(object):
     input_gen = self.text_generator(data.example_generator(self._examples, self._single_pass))
     while True:
       try:
-        (article, abstract) = next(input_gen) # read the next example from file. article and abstract are both strings.
+        (article, xabstract) = next(input_gen) # read the next example from file. article and abstract are both strings.
         # print('ARTICLE:', article)
         # print('ARTICLE:', abstract)
         # print(30*'=')
@@ -436,9 +435,11 @@ class TaskBatcher(Batcher):
           break
         else:
           raise Exception("single_pass mode is off but the example generator is out of data; error.")
-
-      example = TaskExample(context, task, summary, self._vocab) # Process into an Example.
-      self._example_queue.put(example) # place the Example in the example queue.
+      try:      
+        example = TaskExample(context, task, summary, self._vocab) # Process into an Example.
+        self._example_queue.put(example) # place the Example in the example queue.
+      except:
+        print('warning, a TaskExample failed to be created')
         
   def text_generator(self, example_generator):
     while True:
