@@ -114,7 +114,13 @@ function summarize(email_text) {
 
 	var cloud_fn_url = 'https://us-central1-sigma-smile-251401.cloudfunctions.net/classifier2'
 
-	console.log(cloud_fn_url)
+	gapi.load('client:auth2', () => {
+		alert("Loaded gmail");
+	    gapi.client.load('gmail', 'v1', () => {
+	      console.log('Loaded Gmail');
+	    });
+	})
+	console.log(cloud_fn_url);
 	
 	return fetch(cloud_fn_url, {
 	    method: 'post',
@@ -155,24 +161,26 @@ document.getElementById('clickMe').addEventListener('click', start);
 // document.getElementById('clickMe').addEventListener('click', summarize);
 
 
-// gapi.load('client:auth2', () => {
-//     gapi.client.load('gmail', 'v1', () => {
-//       console.log('Loaded Gmail');
-//     });
-// })
+gapi.load('client:auth2', () => {
+    gapi.client.load('gmail', 'v1', () => {
+      console.log('Loaded Gmail');
+    });
+})
 
-// var gmail_id = document.querySelector('[data-message-id]').getAttribute('data-legacy-message-id');
-// var user_id = 'me';
+var request = gapi.client.gmail.users
 
-// function getMessage(userId, messageId, callback) {
-//   var request = gapi.client.gmail.users.messages.get({
-//     'userId': userId,
-//     'id': messageId
-//   });
-//   request.execute(callback);
-// }
+var gmail_id = document.querySelector('[data-message-id]').getAttribute('data-legacy-message-id');
+var user_id = 'me';
 
-// var email_text = getMessage(user_id,gmail_id);
+function getMessage(userId, messageId, callback) {
+  var request = gapi.client.gmail.users.messages.get({
+    'userId': userId,
+    'id': messageId
+  });
+  request.execute(callback);
+}
+
+var email_text = getMessage(user_id,gmail_id);
 // console.log(email_text);
 
 
