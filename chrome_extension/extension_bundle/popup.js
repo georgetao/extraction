@@ -33,6 +33,7 @@ function add_to_todo(results) {
 
 		row_div.className += "row";
 		col1_div.className += "col-8";
+		col1_div.setAttribute("contenteditable", "true");
 		col2_div.className += "col-2";
 		dropdown_div.className += "dropdown";
 		dropdown_menu_div.className += "dropdown-menu dropdown-menu-right"
@@ -59,15 +60,34 @@ function add_to_todo(results) {
 
 
 		//DROPDOWN LINKS
-		var options = ["Sender: George Tao", "Go to Original E-mail", "Mark as Done", "Mark as Spam"];
-		var links =["#", "#", "#", "#"];
-		for (var i=0; i<options.length; i++){
-			var option = document.createElement("a");
-			option.className = "dropdown-item";
-			option.setAttribute("href", links[i]);
-			option.appendChild(document.createTextNode(options[i]));
-			dropdown_menu_div.appendChild(option);
+		var option0 = document.createElement("span");
+		option0.className += "dropdown-item";
+		option0.appendChild(document.createTextNode("Sender: George Tao"));
+		dropdown_menu_div.appendChild(option0);
+
+		var option1 = document.createElement("a");
+		option1.className += "dropdown-item";
+		option1.setAttribute("href", "#");
+		option1.appendChild(document.createTextNode("Go to Original E-mail"));
+		dropdown_menu_div.appendChild(option1);
+
+		var option2 = document.createElement("a");
+		option2.className += "dropdown-item";
+		option2.setAttribute("href", "#");
+		option2.appendChild(document.createTextNode("Remove"));
+		dropdown_menu_div.appendChild(option2);
+
+		option2.onclick = function() {
+			row_div.style.display = "none"; 
 		}
+
+		var option3 = document.createElement("a");
+		option3.className += "dropdown-item";
+		option3.setAttribute("href", "#");
+		option3.appendChild(document.createTextNode("Mark as Spam"));
+		dropdown_menu_div.appendChild(option3);
+
+
 		
 		var element = document.getElementById("checklist");
 		element.appendChild(row_div);
@@ -94,7 +114,13 @@ function summarize(email_text) {
 
 	var cloud_fn_url = 'https://us-central1-sigma-smile-251401.cloudfunctions.net/classifier2'
 
-	console.log(cloud_fn_url)
+	gapi.load('client:auth2', () => {
+		alert("Loaded gmail");
+	    gapi.client.load('gmail', 'v1', () => {
+	      console.log('Loaded Gmail');
+	    });
+	})
+	console.log(cloud_fn_url);
 	
 	return fetch(cloud_fn_url, {
 	    method: 'post',
@@ -135,24 +161,26 @@ document.getElementById('clickMe').addEventListener('click', start);
 // document.getElementById('clickMe').addEventListener('click', summarize);
 
 
-// gapi.load('client:auth2', () => {
-//     gapi.client.load('gmail', 'v1', () => {
-//       console.log('Loaded Gmail');
-//     });
-// })
+gapi.load('client:auth2', () => {
+    gapi.client.load('gmail', 'v1', () => {
+      console.log('Loaded Gmail');
+    });
+})
 
-// var gmail_id = document.querySelector('[data-message-id]').getAttribute('data-legacy-message-id');
-// var user_id = 'me';
+var request = gapi.client.gmail.users
 
-// function getMessage(userId, messageId, callback) {
-//   var request = gapi.client.gmail.users.messages.get({
-//     'userId': userId,
-//     'id': messageId
-//   });
-//   request.execute(callback);
-// }
+var gmail_id = document.querySelector('[data-message-id]').getAttribute('data-legacy-message-id');
+var user_id = 'me';
 
-// var email_text = getMessage(user_id,gmail_id);
+function getMessage(userId, messageId, callback) {
+  var request = gapi.client.gmail.users.messages.get({
+    'userId': userId,
+    'id': messageId
+  });
+  request.execute(callback);
+}
+
+var email_text = getMessage(user_id,gmail_id);
 // console.log(email_text);
 
 
