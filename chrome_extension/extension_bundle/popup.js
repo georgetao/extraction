@@ -19,6 +19,10 @@ function read_emails() {
 
 //should take in list of strings
 function add_to_todo(results) {
+	if (results.length == 0) {
+	  		alert('No tasks identified!')
+	  	}
+	console.log(results.length)
 	for (i in results) {
 		//ALL OF THIS IS JUST SETTING UP THE ENVIRONMENT
 		var row_div = document.createElement("div");
@@ -114,12 +118,6 @@ function summarize(email_text) {
 
 	var cloud_fn_url = 'https://us-central1-sigma-smile-251401.cloudfunctions.net/classifier2'
 
-	gapi.load('client:auth2', () => {
-		alert("Loaded gmail");
-	    gapi.client.load('gmail', 'v1', () => {
-	      console.log('Loaded Gmail');
-	    });
-	})
 	console.log(cloud_fn_url);
 	
 	return fetch(cloud_fn_url, {
@@ -133,6 +131,7 @@ function summarize(email_text) {
 	  .then(response => response.json())
 	  .then(function (data) {
 	  	var results = [];
+	  	console.log("Checkpoint")
 	    for (i in data) {
 	    	results.push(data[i])
 	    }
@@ -161,26 +160,28 @@ document.getElementById('clickMe').addEventListener('click', start);
 // document.getElementById('clickMe').addEventListener('click', summarize);
 
 
-gapi.load('client:auth2', () => {
-    gapi.client.load('gmail', 'v1', () => {
-      console.log('Loaded Gmail');
-    });
-})
+// ******** WORK IN PROGRESS ON GMAIL API ********
 
-var request = gapi.client.gmail.users
+// gapi.load('client:auth2', () => {
+//     gapi.client.load('gmail', 'v1', () => {
+//       console.log('Loaded Gmail');
+//     });
+// })
 
-var gmail_id = document.querySelector('[data-message-id]').getAttribute('data-legacy-message-id');
-var user_id = 'me';
+// var request = gapi.client.gmail.users
 
-function getMessage(userId, messageId, callback) {
-  var request = gapi.client.gmail.users.messages.get({
-    'userId': userId,
-    'id': messageId
-  });
-  request.execute(callback);
-}
+// var gmail_id = document.querySelector('[data-message-id]').getAttribute('data-legacy-message-id');
+// var user_id = 'me';
 
-var email_text = getMessage(user_id,gmail_id);
+// function getMessage(userId, messageId, callback) {
+//   var request = gapi.client.gmail.users.messages.get({
+//     'userId': userId,
+//     'id': messageId
+//   });
+//   request.execute(callback);
+// }
+
+// var email_text = getMessage(user_id,gmail_id);
 // console.log(email_text);
 
 
