@@ -42,8 +42,8 @@ def process_data(df, col_func, parallel=True):
 def split_task_data(df):
   # shuffle
   df = df.sample(frac=1)
-  ts = int(.2 * df.shape[0]) # test size
-  vs = 300                   # val size
+  ts = 800                 # test size
+  vs = 200                 # val size
   # split
   val = df[:vs]
   test = df[vs:(ts+vs)]
@@ -85,11 +85,11 @@ def main():
   split_task_data(task)
 
   # process / split wikihow data
-  wiki = pd.read_csv(os.path.join(config.sum_path, 'wiki.tsv'), sep='\t')
-  wiki = wiki.dropna()
-  wiki = process_wiki_data(wiki)
-  wiki = process_data(wiki, col_func_map)
-  split_wiki_data(wiki)
+  # wiki = pd.read_csv(os.path.join(config.sum_path, 'wiki.tsv'), sep='\t')
+  # wiki = wiki.dropna()
+  # wiki = process_wiki_data(wiki)
+  # wiki = process_data(wiki, col_func_map)
+  # split_wiki_data(wiki)
 
   end = time.time()
   elapsed = end - start

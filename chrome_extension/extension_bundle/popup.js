@@ -19,6 +19,10 @@ function read_emails() {
 
 //should take in list of strings
 function add_to_todo(results) {
+	if (results.length == 0) {
+	  		alert('No tasks identified!')
+	  	}
+	console.log(results.length)
 	for (i in results) {
 		//ALL OF THIS IS JUST SETTING UP THE ENVIRONMENT
 		var row_div = document.createElement("div");
@@ -114,7 +118,7 @@ function summarize(email_text) {
 
 	var cloud_fn_url = 'https://us-central1-sigma-smile-251401.cloudfunctions.net/classifier2'
 
-	console.log(cloud_fn_url)
+	console.log(cloud_fn_url);
 	
 	return fetch(cloud_fn_url, {
 	    method: 'post',
@@ -127,6 +131,7 @@ function summarize(email_text) {
 	  .then(response => response.json())
 	  .then(function (data) {
 	  	var results = [];
+	  	console.log("Checkpoint")
 	    for (i in data) {
 	    	results.push(data[i])
 	    }
@@ -155,11 +160,15 @@ document.getElementById('clickMe').addEventListener('click', start);
 // document.getElementById('clickMe').addEventListener('click', summarize);
 
 
+// ******** WORK IN PROGRESS ON GMAIL API ********
+
 // gapi.load('client:auth2', () => {
 //     gapi.client.load('gmail', 'v1', () => {
 //       console.log('Loaded Gmail');
 //     });
 // })
+
+// var request = gapi.client.gmail.users
 
 // var gmail_id = document.querySelector('[data-message-id]').getAttribute('data-legacy-message-id');
 // var user_id = 'me';

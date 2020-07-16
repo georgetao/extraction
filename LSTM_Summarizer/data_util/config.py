@@ -5,13 +5,13 @@ log_root = "/Users/rowancassius/Desktop/capstone/LSTM_Summarizer"
 sum_path        =  os.path.join(log_root, "data/sum")
 vocab_path      =  os.path.join(log_root, "data/vocab")
 embed_path      =  os.path.join(log_root, "data/embeddings")  
-save_model_path =  os.path.join(log_root, "data/saved_models")  
+# save_model_path =  os.path.join(log_root, "data/saved_models")  
 
 # Hyperparameters
 hidden_dim = 512
 emb_dim = 200 # 256
 batch_size = 200
-max_enc_steps = 100		#99% of the articles are within length 55
+max_enc_steps = 120		#99% of the articles are within length 55
 max_dec_steps = 15		#99% of the titles are within length 15
 beam_size = 4
 min_dec_steps= 2
