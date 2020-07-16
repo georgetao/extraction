@@ -60,11 +60,11 @@ function add_to_todo(results) {
 		header3.appendChild(itemText);
 
 		header3.className += "mb-0";
-		itemText.setAttribute("contenteditable", "true")
+		itemText.setAttribute("contenteditable", "true");
+		itemText.setAttribute("name", "task");
 		itemText.appendChild(inputText);
 
 		tabButton.setAttribute("data-toggle", "collapse");
-		//CHANGE THIS
 		tabButton.setAttribute("data-target", "#item".concat(id_counter))
 
 		//DROPDOWN LINKS
@@ -159,6 +159,23 @@ document.getElementById('clickMe').addEventListener('click', start);
 
 document.getElementById('add-item').addEventListener('click', function() {
 	add_to_todo(['Text Here']);
+})
+
+document.getElementById('copy-clipboard').addEventListener('click', function() {
+	var tasks = document.getElementsByName("task");
+	var vals = [];
+	for (var i=0; i<tasks.length; i++) {
+		vals.push(tasks[i].childNodes[0].data);
+	}
+	var copyText = vals.join(", ");
+	var dummy = document.createElement('textarea');
+	document.body.appendChild(dummy);
+	dummy.value = copyText;
+	dummy.select();
+	// copyText.select();
+
+	document.execCommand("copy");
+	document.body.removeChild(dummy);
 })
 
 // document.getElementById('clickMe').addEventListener('click', summarize);
