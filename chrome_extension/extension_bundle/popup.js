@@ -60,10 +60,13 @@ function add_to_todo(results) {
 		header3.appendChild(itemText);
 
 		header3.className += "mb-0";
+
+		itemText.className += "text-action";
 		itemText.setAttribute("contenteditable", "true");
 		itemText.setAttribute("name", "task");
 		itemText.appendChild(inputText);
 
+		tabButton.className += "fa fa-caret-down d-flex align-items-center";
 		tabButton.setAttribute("data-toggle", "collapse");
 		tabButton.setAttribute("data-target", "#item".concat(id_counter))
 
@@ -174,7 +177,7 @@ document.getElementById('copy-clipboard').addEventListener('click', function() {
 	document.body.appendChild(dummy);
 	dummy.value = copyText;
 	dummy.select();
-	
+
 	document.execCommand("copy");
 	document.body.removeChild(dummy);
 })

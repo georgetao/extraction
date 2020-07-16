@@ -64,4 +64,9 @@ img {
   justify-content: space-between;
 }
 
+.text-action{
+  max-width:220px;
+  overflow-wrap: break-word;
+}
+
  
