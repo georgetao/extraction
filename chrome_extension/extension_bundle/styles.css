@@ -14,6 +14,7 @@ h3 {
 
 .card-checklist {
   background-color: #252423;
+  border: none;
 }
 
 button {
@@ -55,6 +56,12 @@ a:hover {
 
 img {
   width:30px;
+}
+
+.tab-checklist{
+  display:flex;
+
+  justify-content: space-between;
 }
 
  
