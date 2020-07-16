@@ -168,12 +168,13 @@ document.getElementById('copy-clipboard').addEventListener('click', function() {
 		vals.push(tasks[i].childNodes[0].data);
 	}
 	var copyText = vals.join(", ");
+
+
 	var dummy = document.createElement('textarea');
 	document.body.appendChild(dummy);
 	dummy.value = copyText;
 	dummy.select();
-	// copyText.select();
-
+	
 	document.execCommand("copy");
 	document.body.removeChild(dummy);
 })

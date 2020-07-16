@@ -9,6 +9,7 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="nodes/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="nodes/font-awesome/css/font-awesome.min.css">
     <link rel="stylesheet" href="styles.css">
    <!--  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> -->
   </head>
@@ -18,7 +19,7 @@
         <div class="col-12">
           <h3>Input Text:</h3>
           <textarea id="myTextArea" name="myTextArea" rows="5" style="width:100%" placeholder="Paste Email Text Here"></textarea>
-          <a><button id="clickMe" class="btn btn-block" >Extract</button></a> <br>
+          <a id="clickMe">Extract</a> <br>
         </div>
       </div>
 
@@ -76,12 +77,12 @@
           </div> -->
 <!-- end of experiment -->
       </div>
-      <div class="row" style>
-        <div class="col-12">
-          <a id="add-item">&plus;</a>
+      <div class="row">
+        <div class="col-2">
+          <a id="add-item" class="fa fa-plus"></a>
         </div>
-        <div class="col-12">
-          <a id="copy-clipboard">Copy to Clipboard</a>
+        <div class="col-2">
+          <a id="copy-clipboard" class="fa fa-clipboard"></a>
         </div>
       </div>
     </div>
