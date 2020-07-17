@@ -17,16 +17,8 @@ function read_emails() {
 	return document.getElementById("myTextArea").value
 }
 
-var id_counter = 0;
-//should take in list of strings
-function add_to_todo(results) {
-	if (results.length == 0) {
-	  		alert('No tasks identified!')
-	  	}
-	// console.log(results.length)
-	for (i in results) {
-		id_counter += 1;
-		//ALL OF THIS IS JUST SETTING UP THE ENVIRONMENT
+function add_one_item_to_todo(result, id_counter) {
+	//ALL OF THIS IS JUST SETTING UP THE ENVIRONMENT
 		var col_div = document.createElement("div");
 		var card_div = document.createElement("div");
 		var tab_head_div = document.createElement("div");
@@ -50,7 +42,7 @@ function add_to_todo(results) {
 		card_body_div.className += "card-body";
 
 		//TEXT GOES HERE
-		var inputText = document.createTextNode(results[i]);
+		var inputText = document.createTextNode(result);
 		var header3 = document.createElement("h3");
 		var itemText = document.createElement("a");
 		var tabButton = document.createElement("a");
@@ -93,11 +85,24 @@ function add_to_todo(results) {
 
 		option3.onclick = function() {
 			var list = document.getElementById("checklist");
+			alert(tab_div.id);
 			list.insertBefore(col_div, list.childNodes[0]);
 		}
 	
 		var element = document.getElementById("checklist");
 		element.appendChild(col_div);
+}
+
+var id_counter = 0;
+//should take in list of strings
+function add_to_todo(results) {
+	if (results.length == 0) {
+	  		alert('No tasks identified!')
+	  	}
+	// console.log(results.length)
+	for (i in results) {
+		id_counter += 1;
+		add_one_item_to_todo(results[i], id_counter);
 	}
 }
 
@@ -161,7 +166,7 @@ function summarize(email_text) {
 document.getElementById('clickMe').addEventListener('click', start);
 
 document.getElementById('add-item').addEventListener('click', function() {
-	add_to_todo(['Text Here']);
+	add_to_todo(['Text here']);
 })
 
 document.getElementById('copy-clipboard').addEventListener('click', function() {
