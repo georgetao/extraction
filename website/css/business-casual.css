@@ -67,11 +67,14 @@ p {
 .section-heading .section-heading-lower {
   display: block;
   font-size: 3rem;
-  font-weight: 100;
+  font-weight: 300;
+  text-align: center;
+
 }
 
 .bg-faded {
   background-color: rgba(255, 255, 255, 0.85);
+  height: 150px;
 }
 
 #mainNav {
