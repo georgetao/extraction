@@ -18,7 +18,8 @@
   <link href="https://fonts.googleapis.com/css?family=Lora:400,400i,700,700i" rel="stylesheet">
 
   <!-- Custom styles for this template -->
-  <link href="css/business-casual.min.css" rel="stylesheet">
+  <!-- <link href="css/business-casual.min.css" rel="stylesheet"> -->
+  <link href="css/business-casual.css" rel="stylesheet">
 
 </head>
 
@@ -38,13 +39,13 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarResponsive">
         <ul class="navbar-nav mx-auto">
+          <li class="nav-item px-lg-4">
+            <a class="nav-link text-uppercase text-expanded" href="index.html">Home</a>
+          </li>
           <li class="nav-item active px-lg-4">
-            <a class="nav-link text-uppercase text-expanded" href="index.html">Home
+            <a class="nav-link text-uppercase text-expanded" href="about.html">About Us
               <span class="sr-only">(current)</span>
             </a>
-          </li>
-          <li class="nav-item px-lg-4">
-            <a class="nav-link text-uppercase text-expanded" href="about.html">About Us</a>
           </li>
           <li class="nav-item px-lg-4">
             <a class="nav-link text-uppercase text-expanded" href="prototype.html">Prototype</a>
@@ -59,9 +60,50 @@
 
   <section class="page-section about-heading">
     <div class="container">
-      <img class="img-fluid rounded about-heading-img mb-3 mb-lg-0" src="img/about.jpg" alt="">
+      <!-- <img class="img-fluid rounded about-heading-img mb-3 mb-lg-0" src="img/about.jpg" alt=""> -->
       <div class="about-heading-content">
-        <div class="row">
+        
+        <div class="wrapper">
+            <div class="team">
+
+              <div class="team_member">
+                <div class="team_img">
+                  <img src="img/placeholder.png" alt="team_member_image">
+                </div>
+                <h3><a href="https://www.linkedin.com/in/rocassius/" target="_blank">Rowan Cassius</a></h3>
+                <p class="role" onclick="copy(this)"><span title="Left-click to copy address.">rocassius@berkeley.edu</span></p>
+                <p>Alex Sewon Kim is a current 5th year MIDS student at School of Information. He graduated from UC Berkeley in 2019 with a dual degree in Economics and Applied Mathematics. During his undergraduate program, he developed curiosity in data science through the university's economics lab. His currently research interest is applied econometrics emphasis in environmental policy.</p>
+              </div>
+
+              <div class="team_member">
+                <div class="team_img">
+                  <img src="img/percy_circle.png" alt="team_member_image">
+                </div>
+                <h3><a href="https://www.linkedin.com/in/percival-chen/" target="_blank">Percival Chen</a></h3>
+                <p class="role" onclick="copy(this)"><span title="Left-click to copy address.">percivalchen@berkeley.edu</span></p>
+                <p>Percival Chen is a current 5th-year MIDS student. He is a recent graduate at UC Berkeley majoring in Molecular and Cell Biology with honors. During college, he was first exposed to data science through the Bachtrog Lab, where he conducted research and data analysis in a variety of genomic projects. Looking forward, he would like to use big data in industry to glean insights and drive decision-making.</p>
+              </div>
+              
+              <div class="team_member">
+                <div class="team_img">
+                  <img src="img/placeholder.png" alt="team_member_image">
+                </div>
+                <h3><a href="https://www.linkedin.com/in/george-tao/" target="_blank">George Tao</a></h3>
+                <p class="role" onclick="copy(this)"><span title="Left-click to copy address.">georgetao258@berkeley.edu</span></p>
+                <p>George Tao is a current 5th-year MIDS student. As an undergraduate at UC Berkeley, he studied math and computer science and plans on pursuing a career in software engineering and data science. He was drawn towards data science through his previous passion for fantasy basketball and strategy games.</p>
+              </div>
+
+              <div class="team_member">
+                <div class="team_img">
+                  <img src="img/placeholder.png" alt="team_member_image">
+                </div>
+                <h3><a href="https://www.linkedin.com/in/natalie-wang-ucb/" target="_blank">Natalie Wang</a></h3>
+                <p class="role" onclick="copy(this)"><span title="Left-click to copy address.">n.wang@berkeley.edu</span></p>
+                <p>Jennifer Patterson-Radovancevic is a current 5th year MIDS student. She graduated in 2019 from UC Berkeley with degrees in Political Science and Molecular and Cellular Neurobiology. In undergrad, she contributed to research developing an empirical model of international apologies for breaches of international law. In the future, she hopes to us data science to study the effects of cognition on political behavior. </p>
+              </div>
+            </div>
+          </div>
+       <!--  <div class="row">
           <div class="col-xl-9 col-lg-10 mx-auto">
             <div class="bg-faded rounded p-5">
               <h2 class="section-heading mb-4">
@@ -72,7 +114,7 @@
               <p class="mb-0">We guarantee that you will fall in <em>lust</em> with our decadent blends the moment you walk inside until you finish your last sip. Join us for your daily routine, an outing with friends, or simply just to enjoy some alone time.</p>
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
   </section>
@@ -86,6 +128,7 @@
   <!-- Bootstrap core JavaScript -->
   <script src="vendor/jquery/jquery.min.js"></script>
   <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="main.js"></script>
 
 </body>
 
