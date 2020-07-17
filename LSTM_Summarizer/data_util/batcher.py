@@ -153,6 +153,7 @@ class TaskExample(Example):
     ids = []
     ids_extend = []
     unk_id = vocab.word2id(data.UNKNOWN_TOKEN)
+
     for w in nlp(summary):
       w_text = w.text if w.ent_type_ else w.text.lower() # lower non-entities
       i = vocab.word2id(w_text)

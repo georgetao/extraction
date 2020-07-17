@@ -112,14 +112,16 @@ function summarize(email_text) {
 	  }
 	}
 
-	var cloud_fn_url = 'https://us-central1-sigma-smile-251401.cloudfunctions.net/classifier2'
+	// var cloud_fn_url = 'https://us-central1-sigma-smile-251401.cloudfunctions.net/classifier2'
+	var cloud_fn_url = 'https://us-central1-sigma-smile-251401.cloudfunctions.net/classify_summarize'
 
-	gapi.load('client:auth2', () => {
-		alert("Loaded gmail");
-	    gapi.client.load('gmail', 'v1', () => {
-	      console.log('Loaded Gmail');
-	    });
-	})
+	// gapi.load('client:auth2', () => {
+	// 	alert("Loaded gmail");
+	//     gapi.client.load('gmail', 'v1', () => {
+	//       console.log('Loaded Gmail');
+	//     });
+	// })
+	
 	console.log(cloud_fn_url);
 	
 	return fetch(cloud_fn_url, {
@@ -161,26 +163,28 @@ document.getElementById('clickMe').addEventListener('click', start);
 // document.getElementById('clickMe').addEventListener('click', summarize);
 
 
-gapi.load('client:auth2', () => {
-    gapi.client.load('gmail', 'v1', () => {
-      console.log('Loaded Gmail');
-    });
-})
+// gapi.load('client:auth2', () => {
+//     gapi.client.load('gmail', 'v1', () => {
+//       console.log('Loaded Gmail');
+//     });
+// })
 
-var request = gapi.client.gmail.users
+// // var request = gapi.client.gmail.users
 
-var gmail_id = document.querySelector('[data-message-id]').getAttribute('data-legacy-message-id');
-var user_id = 'me';
+// 	var gmail_id = document.querySelector('[data-message-id]').getAttribute('data-legacy-message-id');
+// 	var user_id = 'me'; 
 
-function getMessage(userId, messageId, callback) {
-  var request = gapi.client.gmail.users.messages.get({
-    'userId': userId,
-    'id': messageId
-  });
-  request.execute(callback);
-}
+// 	function getMessage(userId, messageId, callback) {
+// 	  var request = gapi.client.gmail.users.messages.get({
+// 	    'userId': userId,
+// 	    'id': messageId
+// 	  });
+// 	  request.execute(callback);
+// 	}
 
-var email_text = getMessage(user_id,gmail_id);
+// var email_text = getMessage(user_id, gmail_id);
+
+
 // console.log(email_text);
 
 
