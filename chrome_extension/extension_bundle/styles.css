@@ -12,15 +12,10 @@ h3 {
   text-align: left;
 }
 
-/*NEEDS TO INCLUDE TEXT WRAPPING*/
-.todo {
-  line-height: 1.75;
-  color: white;
+.card-checklist {
+  background-color: #252423;
+  border: none;
 }
-
-/*.dropdown-extraction {
-  padding:0px 50px 0px 0px;
-}*/
 
 button {
      background:none!important;
@@ -61,6 +56,17 @@ a:hover {
 
 img {
   width:30px;
+}
+
+.tab-checklist{
+  display:flex;
+
+  justify-content: space-between;
+}
+
+.text-action{
+  max-width:220px;
+  overflow-wrap: break-word;
 }
 
  
