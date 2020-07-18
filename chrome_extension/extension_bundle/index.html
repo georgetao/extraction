@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+ <!DOCTYPE html>
 <html>
 <title>Test for Chrome Extension</title>
   <head>
@@ -9,6 +9,7 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="nodes/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="nodes/font-awesome/css/font-awesome.min.css">
     <link rel="stylesheet" href="styles.css">
    <!--  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> -->
   </head>
@@ -18,7 +19,8 @@
         <div class="col-12">
           <h3>Input Text:</h3>
           <textarea id="myTextArea" name="myTextArea" rows="5" style="width:100%" placeholder="Paste Email Text Here"></textarea>
-          <a><button id="clickMe" class="btn btn-block" >Extract</button></a> <br>
+          <a id="extractButton">Extract</a>
+          <br>
         </div>
       </div>
 
@@ -31,37 +33,66 @@
 
       <div class="row">
         <div class="col-12">
-          <h3>To Do</h3>
+          <h3>Action Items</h3>
+        </div>
+      </div>
 
-<!-- experiment new format -->
-<!--           <div id="checklist">
-            <div class="card">
-              <div class="card-header" role="tab" id="item1head">
+      <div class="row" id="checklist">
+        <!-- experiment new format -->
+<!-- add dropdown button/right click ideas  -->
+<!--           <div class="col-12">
+            <div class="card card-checklist">
+              <div role="tab" id="item1head" class="tab-checklist">
                 <h3 class="mb-0">
-                  <a data-toggle="collapse" data-target="#item1">Item 1</a>
+                  <a name="task" contenteditable="true">Item 1</a>
                 </h3>
+                <a data-toggle="collapse" data-target="#itemUno"></a>
               </div>
-              <div class="collapse" id="item1" data-parent="#checklist">
+              <div class="collapse" id="itemUno" data-parent="#checklist">
                 <div class="card-body">
                   <span>Sender: George Tao</span>
                   <a href="#">Go to original e-mail.</a>
-                  <a href="#">Remove</a>
+                  <a href="#" class="remove">Remove</a>
+                  <a href="#">Mark as spam</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="card-checklist">
+              <div role="tab" id="item2head" class="tab-checklist">
+                <h3 class="mb-0">
+                  <a name="task" contenteditable="true">Item 2</a>
+                </h3>
+                <a data-toggle="collapse" data-target="#itemDos"></a>
+              </div>
+              <div class="collapse" id="itemDos" data-parent="#checklist">
+                <div class="card-body">
+                  <span>Sender: George Tao</span>
+                  <a href="#">Go to original e-mail.</a>
+                  <a href="#" class="remove">Remove</a>
                   <a href="#">Mark as spam</a>
                 </div>
               </div>
             </div>
           </div> -->
 <!-- end of experiment -->
+      </div>
+      <div class="row">
+        <div class="col-2">
+          <a id="add-item" class="fa fa-plus"></a>
+        </div>
+        <div class="col-2">
+          <a id="copy-clipboard" class="fa fa-clipboard"></a>
         </div>
       </div>
     </div>
 
-    <div class="container" id="checklist">
-      <!-- <div class="row">
+<!--     <div class="container" id="checklist">
+      <div class="row">
         <div class="col-8" contenteditable="true">
           Todo #1.
         </div>
-
         <div class="col-2">
           <div class="dropdown">
             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -76,12 +107,10 @@
           </div>
         </div>
       </div>
-
       <div class="row">
         <div class="col-8">
           Todo #2.
         </div>
-
         <div class="col-2">
           <div class="dropdown">
             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -95,8 +124,8 @@
             </div>
           </div>
         </div>
-      </div> -->
-    </div>
+      </div>
+    </div> -->
   </body>
 
     <!-- jQuery first, then Popper.js, then Bootstrap JS. -->
@@ -105,6 +134,3 @@
   <script src="nodes/bootstrap/dist/js/bootstrap.min.js"></script>
   <script type="text/javascript" src="popup.js" defer></script>
 </html>
-
-
-
