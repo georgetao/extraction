@@ -14,6 +14,7 @@ function read_emails() {
 	// }
 	// var email_text = getMessage(user_id, gmail_id)
 	// console.log(email_text)
+
 	return document.getElementById("myTextArea").value
 }
 
@@ -85,7 +86,6 @@ function add_one_item_to_todo(result, id_counter) {
 
 		option3.onclick = function() {
 			var list = document.getElementById("checklist");
-			alert(tab_div.id);
 			list.insertBefore(col_div, list.childNodes[0]);
 		}
 	
@@ -107,8 +107,23 @@ function add_to_todo(results) {
 }
 
 function start () {
+	var extractButton = document.getElementById("extractButton");
+	extractButton.innerHTML = "";
+	extractButton.className = "inactiveLink";
+	
+	var load_div = document.createElement("div");
+	load_div.className = "loader";
+	load_div.id = "loader";
+	
+	extractButton.appendChild(load_div);
+
+
 	var email_text = read_emails();
 	summarize(email_text);
+
+	// changes back after cloud function is called.. look in summarize
+
+
 }
 
 //Summarize also adds tasks to the to_do_list
@@ -157,13 +172,18 @@ function summarize(email_text) {
 	  })
 	  .then(function(data) {
 	  	add_to_todo(data);
+
+	  	// Changing loading spinner back to normal
+	  	extractButton = document.getElementById("extractButton");
+	  	extractButton.innerHTML = "Extract";
+		extractButton.className = "";
 	  })
 	  .catch(function (error) {
 	    alert(error);
 	  });
 	}
 
-document.getElementById('clickMe').addEventListener('click', start);
+document.getElementById('extractButton').addEventListener('click', start);
 
 document.getElementById('add-item').addEventListener('click', function() {
 	add_to_todo(['Text here']);
