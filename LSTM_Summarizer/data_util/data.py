@@ -112,11 +112,13 @@ def abstract2ids(abstract_words, vocab, article_oovs):
   return ids
 
 
-def outputids2words(id_list, vocab, article_oovs):
+def outputids2words(id_list, vocab, article_oovs, head_chunk_map):
   words = []
   for i in id_list:
     try:
-      w = vocab.id2word(i) # might be [UNK]
+      w = vocab.id2word(i)
+      w = head_chunk_map[w] if w in head_chunk_map else w # might be [UNK]
+      # w = head_chunk_map[w] if (w in head_chunk_map and len(w.split()) > 1) else w # might be [UNK]
     except ValueError as e: # w is OOV
       assert article_oovs is not None, "Error: model produced a word ID that isn't in the vocabulary. This should not happen in baseline (no pointer-generator) mode"
       article_oov_idx = i - vocab.size()
@@ -167,9 +169,15 @@ def show_abs_oovs(abstract, vocab, article_oovs):
   out_str = ' '.join(new_words)
   return out_str
 
-
-
 ####### Additional Helper Functions for TaskExamples ##########
+
+def matchesOOV(word, oov):
+    w, v = word.lower(), oov.lower()
+    if w == v or w in v:
+        return True
+    W, V = set(w.split()), set(v.split())
+    return len(W.intersection(V)) / (min(len(W), len(V))) > 0.5
+
 
 def word2id(word, vocab, entity_label_map):
     if word in entity_label_map:
@@ -180,7 +188,7 @@ def words2ids(words, vocab, entity_label_map):
     return [word2id(w, vocab, entity_label_map) for w in words]
 
 def doc2words(doc):
-    return [w.text if w.ent_type_ else w.text.lower() for w in doc]
+    return [w.text if w.ent_type_ else w.text.lower() for w in doc if not w.is_space]
 
 def words2vocabfile(words, fpath):
     pd.DataFrame(words).to_csv(fpath, sep='\t', header=False, index=False)

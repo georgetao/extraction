@@ -59,7 +59,7 @@ class Evaluate(object):
 
             with T.autograd.no_grad():
                 enc_batch = self.model.embeds(enc_batch)
-                enc_out, enc_hidden = self.model.encoder(enc_batch, enc_lens)
+                enc_out, enc_hidden = selftpre.model.encoder(enc_batch, enc_lens)
 
             print('Summarizing Batch...')
             #-----------------------Summarization----------------------------------------------------
@@ -77,9 +77,14 @@ class Evaluate(object):
                     unk_id,
                     self.vocab.size()
                 )
-
+            
             for i in range(len(pred_ids)):
-                decoded_words = data.outputids2words(pred_ids[i], self.vocab, batch.art_oovs[i])
+                decoded_words = data.outputids2words(
+                    id_list=pred_ids[i], 
+                    vocab=self.vocab, 
+                    article_oovs=batch.art_oovs[i], 
+                    head_chunk_map=batch.head_chunk_map[i]
+                )
                 decoded_words = " ".join(decoded_words)
                 decoded_sents.append(decoded_words)
                 abstract = batch.original_abstracts[i]

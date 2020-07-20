@@ -15,11 +15,11 @@ HYPHENS = r'---+'
 YW = "you wrote:"
 NON_NUM = '[^0-9]'
 
-EMAIL_TIME = "[0-9]?[0-9]:[0-9][0-9]\s[AP]M"
+EMAIL_TIME = r"[0-9]?[0-9]:[0-9][0-9]\s[AP]M"
 EA = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b"
 PH = r"(\d{0,2}[\s\.-]{0,3}\(?\d{0,3}\)?[\s\.-]{0,3}\d{3,4}[\s\.-]{0,3}\d{3,4})\b"
 WB = r"""(?i)\b((?:https?:(?:/{1,3}|[a-z0-9%])|[a-z0-9.\-]+[.](?:com|net|org|edu|gov|mil|aero|asia|biz|cat|coop|info|int|jobs|mobi|museum|name|post|pro|tel|travel|xxx|ac|ad|ae|af|ag|ai|al|am|an|ao|aq|ar|as|at|au|aw|ax|az|ba|bb|bd|be|bf|bg|bh|bi|bj|bm|bn|bo|br|bs|bt|bv|bw|by|bz|ca|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|co|cr|cs|cu|cv|cx|cy|cz|dd|de|dj|dk|dm|do|dz|ec|ee|eg|eh|er|es|et|eu|fi|fj|fk|fm|fo|fr|ga|gb|gd|ge|gf|gg|gh|gi|gl|gm|gn|gp|gq|gr|gs|gt|gu|gw|gy|hk|hm|hn|hr|ht|hu|id|ie|il|im|in|io|iq|ir|is|it|je|jm|jo|jp|ke|kg|kh|ki|km|kn|kp|kr|kw|ky|kz|la|lb|lc|li|lk|lr|ls|lt|lu|lv|ly|ma|mc|md|me|mg|mh|mk|ml|mm|mn|mo|mp|mq|mr|ms|mt|mu|mv|mw|mx|my|mz|na|nc|ne|nf|ng|ni|nl|no|np|nr|nu|nz|om|pa|pe|pf|pg|ph|pk|pl|pm|pn|pr|ps|pt|pw|py|qa|re|ro|rs|ru|rw|sa|sb|sc|sd|se|sg|sh|si|sj|Ja|sk|sl|sm|sn|so|sr|ss|st|su|sv|sx|sy|sz|tc|td|tf|tg|th|tj|tk|tl|tm|tn|to|tp|tr|tt|tv|tw|tz|ua|ug|uk|us|uy|uz|va|vc|ve|vg|vi|vn|vu|wf|ws|ye|yt|yu|za|zm|zw)/)(?:[^\s()<>{}\[\]]+|\([^\s()]*?\([^\s()]+\)[^\s()]*?\)|\([^\s]+?\))+(?:\([^\s()]*?\([^\s()]+\)[^\s()]*?\)|\([^\s]+?\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’])|(?:(?<!@)[a-z0-9]+(?:[.\-][a-z0-9]+)*[.](?:com|net|org|edu|gov|mil|aero|asia|biz|cat|coop|info|int|jobs|mobi|museum|name|post|pro|tel|travel|xxx|ac|ad|ae|af|ag|ai|al|am|an|ao|aq|ar|as|at|au|aw|ax|az|ba|bb|bd|be|bf|bg|bh|bi|bj|bm|bn|bo|br|bs|bt|bv|bw|by|bz|ca|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|co|cr|cs|cu|cv|cx|cy|cz|dd|de|dj|dk|dm|do|dz|ec|ee|eg|eh|er|es|et|eu|fi|fj|fk|fm|fo|fr|ga|gb|gd|ge|gf|gg|gh|gi|gl|gm|gn|gp|gq|gr|gs|gt|gu|gw|gy|hk|hm|hn|hr|ht|hu|id|ie|il|im|in|io|iq|ir|is|it|je|jm|jo|jp|ke|kg|kh|ki|km|kn|kp|kr|kw|ky|kz|la|lb|lc|li|lk|lr|ls|lt|lu|lv|ly|ma|mc|md|me|mg|mh|mk|ml|mm|mn|mo|mp|mq|mr|ms|mt|mu|mv|mw|mx|my|mz|na|nc|ne|nf|ng|ni|nl|no|np|nr|nu|nz|om|pa|pe|pf|pg|ph|pk|pl|pm|pn|pr|ps|pt|pw|py|qa|re|ro|rs|ru|rw|sa|sb|sc|sd|se|sg|sh|si|sj|Ja|sk|sl|sm|sn|so|sr|ss|st|su|sv|sx|sy|sz|tc|td|tf|tg|th|tj|tk|tl|tm|tn|to|tp|tr|tt|tv|tw|tz|ua|ug|uk|us|uy|uz|va|vc|ve|vg|vi|vn|vu|wf|ws|ye|yt|yu|za|zm|zw)\b/?(?!@)))"""
-BLACK = "[^A-Za-z0-9\s\?!,'\.;:/\-@*%#~&]+"
+BLACK = r"[^A-Za-z0-9\s\?!,'\.;:/\-@*%#~&]+"
 
 
 # Strings
@@ -120,7 +120,6 @@ from collections import OrderedDict
 BAD_20 = r'\b20\b'
 ANYSPACE = r'[\t\n\s]'
 SENDER = 'SENDER'
-# ENRON = r'\b(Enron|enron|ENRON)\b'
 ENRON = re.compile(r'\benron\b', re.IGNORECASE)
 EMAIL_WORD = re.compile(r'\be\s?-?\s?mail\b', re.IGNORECASE)
 ASAP = re.compile(r'\b' + r'\s?\.?\s?'.join('asap') + r'\.?', re.IGNORECASE)
@@ -131,6 +130,12 @@ ERASE = '|'.join([BLACK, BAD_20, EDGE_NL])
 BLACK_NO_PER = r"[^A-Za-z0-9\s\?!,';:/\-@*%#~&]+"
 EXT_PER = r'[\.\?\!,]\.' # extra period
 ext_per_repl = lambda match: match.group()[0]   # extra period fixer
+
+
+
+FIRST_PER_ADJ = re.compile('my|mine', re.IGNORECASE)
+# replace_first_per_adj = lambda text: re.sub(FIRST_PER_ADJ, "SENDER's", text)
+replace_first_per_adj = lambda text: re.sub(FIRST_PER_ADJ, '', text)
 
 
 # Constants
@@ -236,10 +241,19 @@ def custom_ents(doc):
 
 
 # CREATE CUSTOM NLP function from SpaCy
-nlp = spacy.load("en_core_web_sm", disable=["tagger", "parser"])
+nlp = spacy.load("en_core_web_sm")
 nlp.add_pipe(custom_ents, name = 'custom', first=True)
 nlp.add_pipe(nlp.create_pipe("merge_entities"))
+nlp.add_pipe(nlp.create_pipe("merge_noun_chunks"))    
 
+
+
+#### function for processing in TaskExampls
+
+def process(text):
+    text = text.strip()
+    text = replace_first_per_adj(text)
+    return text
 
 
 

@@ -2,6 +2,7 @@
 
 import queue as Queue
 import time
+from itertools import chain
 from random import shuffle
 from threading import Thread
 
@@ -75,7 +76,6 @@ class Example(object):
     while len(self.target) < max_len:
       self.target.append(pad_id)
 
-
   def pad_encoder_input(self, max_len, pad_id):
     while len(self.enc_input) < max_len:
       self.enc_input.append(pad_id)
@@ -93,11 +93,21 @@ class TaskExample(Example):
     start_decoding = vocab.word2id(data.START_DECODING)
     stop_decoding = vocab.word2id(data.STOP_DECODING)
 
+    print(60*'=')
+    print('CONTEXT:', list(nlp(context)), '\n')
+    print('TASK:   ', list(nlp(task)), '\n')
+    print('SUMMARY:', list(nlp(summary)))
+    print(60*'=')
+
     # Process the context and the task
-    context, task = nlp(context), nlp(task)
-    self.entity_label_map = {**{e.text: e.label_ for e in context.ents}, 
-                             **{e.text: e.label_ for e in task.ents}}
-    
+    context, task = nlp(process(context)), nlp(process(task)) 
+    self.entity_label_map = {e.text: e.label_ for e in task.ents + context.ents}
+    self.chunk_head_map = {c.text.lower(): c.text.lower().split()[-1] for 
+                           c in chain(task.noun_chunks, context.noun_chunks)}
+    print('entity label', self.entity_label_map)
+    print('chunk head', self.chunk_head_map)  
+    self.head_chunk_map = {h:c for c,h in self.chunk_head_map.items()}
+
     # Reduce if necessary
     if len(context) + len(task) > config.max_enc_steps:
       t = min(len(task), config.max_enc_steps)
@@ -117,10 +127,8 @@ class TaskExample(Example):
 
     # If using pointer-generator mode, we need to store some extra info
     # Store a version of the enc_input where in-article OOVs are represented by their temporary OOV id; also store the in-article OOVs words themselves
-    self.enc_input_extend_vocab, self.article_oovs = data.article2ids(
-      data.doc2words(context) + data.doc2words(task), vocab
-    )
-
+    self.enc_input_extend_vocab, self.article_oovs = self.article2ids(context, task, vocab)
+    print('OOVs', self.article_oovs)
     # Process the summary
     # Get a verison of the reference summary where in-article OOVs are represented by their temporary article OOV id
     sum_ids, sum_ids_extend_vocab = self.summary2ids_(summary, vocab)
@@ -142,37 +150,58 @@ class TaskExample(Example):
   def word2id(self, word, vocab):
       if word in self.entity_label_map:
         return vocab.word2id(self.entity_label_map[word])
-      return vocab.word2id(word) 
+      elif word.lower() in self.chunk_head_map:
+        return vocab.word2id(self.chunk_head_map[word.lower()])
+      else:
+        return vocab.word2id(word.lower()) 
 
   def doc2ids(self, doc, vocab):
-      return [self.word2id(w.text, vocab) if w.ent_type_ else 
-              self.word2id(w.text.lower(), vocab) for w in doc]
+      return [self.word2id(w.text, vocab) for w in doc if not w.is_space]
+
+  def article2ids(self, context, task, vocab):
+    ids = []
+    oovs = []
+    unk_id = vocab.word2id(data.UNKNOWN_TOKEN)
+    for w in chain(context, task):
+      if w.is_space:
+        continue
+      w = w.text
+      i = self.word2id(w, vocab)
+      if i == unk_id: 
+        if w not in oovs: 
+          oovs.append(w)
+        oov_num = oovs.index(w) # This is 0 for the first article OOV, 1 for the second article OOV...
+        ids.append(vocab.size() + oov_num) # This is e.g. 50000 for the first article OOV, 50001 for the second...
+      else:
+        ids.append(i)
+    return ids, oovs
 
   def summary2ids_(self, summary, vocab):
     'Returns an id list where in-article OOVs are represented by temporary ids'
     ids = []
     ids_extend = []
-    unk_id = vocab.word2id(data.UNKNOWN_TOKEN)
+    unk_id = self.word2id(data.UNKNOWN_TOKEN, vocab)
 
     for w in nlp(summary):
-      w_text = w.text if w.ent_type_ else w.text.lower() # lower non-entities
-      i = vocab.word2id(w_text)
+      if w.is_space: # disregard space tokens
+        continue
+      w_text = w.text if w.ent_type_ else w.text.split()[-1].lower()  # lower non-entities
+      i = self.word2id(w_text, vocab)
       if i == unk_id: # If w is an OOV word
-        w_ = w_text.lower()
-        is_oovs = np.array([[w_ is oov.lower(), w_ in oov.lower()] for oov in self.article_oovs]).T
+        is_oovs = [data.matchesOOV(w_text, oov) for oov in self.article_oovs]
         if np.any(is_oovs): # If w is an article OOV
-          oov = self.article_oovs[np.argmax(is_oovs[0] if any(is_oovs[0]) else is_oovs[1])]
+          oov = self.article_oovs[np.argmax(is_oovs)]
           vocab_idx = vocab.size() + self.article_oovs.index(oov)
           ids_extend.append(vocab_idx)
-          ids.append(vocab.word2id(w.ent_type_ if w.ent_type_ else w_text))
+          ids.append(self.word2id(oov, vocab))        
         else: # If w is an out-of-article OOV
-          w_ids = [vocab.word2id(v.text.lower()) for v in nlp(w_text)]
+          w_ids = [self.word2id(v.text.lower(), vocab) for v in nlp(w_text)]
           ids_extend += w_ids
           ids += w_ids
       else:
         ids_extend.append(i)
         ids.append(i)
-    assert len(ids) == len(ids_extend)    
+    assert len(ids) == len(ids_extend)  
     return ids, ids_extend 
 
     # summary token _s_ will be represented by article OOV token _a_ if
@@ -235,6 +264,8 @@ class Batch(object):
     self.max_art_oovs = max([len(ex.article_oovs) for ex in example_list])
     # Store the in-article OOVs themselves
     self.art_oovs = [ex.article_oovs for ex in example_list]
+    # store the examples' head chunk maps
+    self.head_chunk_map = [ex.head_chunk_map for ex in example_list] 
     # Store the version of the enc_batch that uses the article OOV ids
     self.enc_batch_extend_vocab = np.zeros((self.batch_size, max_enc_seq_len), dtype=np.int32)
     for i, ex in enumerate(example_list):
@@ -436,11 +467,13 @@ class TaskBatcher(Batcher):
           break
         else:
           raise Exception("single_pass mode is off but the example generator is out of data; error.")
-      try:      
-        example = TaskExample(context, task, summary, self._vocab) # Process into an Example.
-        self._example_queue.put(example) # place the Example in the example queue.
-      except:
-        print('warning, a TaskExample failed to be created')
+      # try:      
+      #   example = TaskExample(context, task, summary, self._vocab) # Process into an Example.
+      #   self._example_queue.put(example) # place the Example in the example queue.
+      # except:
+      #   print('warning, a TaskExample failed to be created')
+      example = TaskExample(context, task, summary, self._vocab) # Process into an Example.
+      self._example_queue.put(example) # place the Example in the example queue.
         
   def text_generator(self, example_generator):
     while True:
