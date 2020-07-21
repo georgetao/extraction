@@ -10,11 +10,11 @@ from summarizer import *
 model_file = '/tmp/model.tar'
 storage_client = storage.Client()
 bucket = storage_client.get_bucket('extraction_bucket_1')
-blob = bucket.blob('saved_models/0000360.tar')
+blob = bucket.blob('saved_models/0000180.tar')
 blob.download_to_filename(model_file)
 
 # Create Summarizer
-summarizer  = Summarizer(vocab_path = 'vocab.txt', model_path = model_file, model = TaskModel)
+summarizer  = Summarizer(vocab_path='data/vocab/vocab3.txt', model_path=model_file, model=TaskModel)
 
 def summarize(request):
   request_json = request.get_json(silent=True)
