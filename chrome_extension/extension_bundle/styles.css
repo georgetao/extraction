@@ -1,10 +1,11 @@
 body {
 	width: 300px; 
 	overflow:hidden;
-  background-color: floralwhite;
+  background-color: #f4f4f4; /* This color is literally called "Cultured". Floralwhite was the old color */
   border-radius: 8px;
-  font-family: 'Roboto';
+  font-family: 'Lato';
   color: #585858;
+  /*color:#3D3D3D;*/
   padding:15px 0px 15px 0px;
 }
 
@@ -13,7 +14,7 @@ h3 {
 }
 
 .card-checklist {
-  background-color: floralwhite;
+  background-color: #EBEBEB;
   border: none;
   padding: 0px 0px 4.84px 0px;
 }
@@ -112,7 +113,7 @@ img {
   content: '';
 }
 .loader:after {
-  background: floralwhite;
+  background: #fffaf0;
   width: 75%;
   height: 75%;
   border-radius: 50%;
@@ -152,13 +153,14 @@ img {
 }
 
 #extractButton{
-  background-color: floralwhite;
-  color: #FFC482;
+  background-color: #E0E0E0; /* fffaf0 */
+  /*color:black;*/
+  /*color: #FFC482;*/
 }
 
-/*#extractButton:hover{
-  background-color:black;
-}*/
+#extractButton:hover{
+  background-color:#FFE2C2;
+}
 
 .card-body {
   padding: 0px 0px 10px 0px !important;
@@ -166,6 +168,8 @@ img {
 
 .extraButtons {
   padding: 0px 4.84px 0px 15px;
+  background-color: inherit;
+  color:inherit;
 }
 
 .square {
@@ -179,9 +183,13 @@ img {
 }
 
 .extraction-dropdown-button:hover {
-  background-color: #FFC482;
+  background-color: #E0E0E0;
+}
+
+.extraButtons-body {
+  background-color: #E0E0E0;
 }
 
 .extraButtons-body:hover {
-  background-color: #FFC482;
+  background-color: #FFE2C2;
 }
