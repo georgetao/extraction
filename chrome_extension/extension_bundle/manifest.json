@@ -3,6 +3,7 @@
   "name": "ExtrAction",
   "version": "0.7.5",
   "permissions": [
+    "activeTab",
     "identity", 
     "https://us-central1-sigma-smile-251401.cloudfunctions.net/classifier/*"
   ],
