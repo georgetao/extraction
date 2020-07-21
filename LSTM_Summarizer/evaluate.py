@@ -25,13 +25,14 @@ class Evaluate(object):
         self.vocab = vocab
         self.batcher = batcher
         self.model_path = model_path
-        time.sleep(1)
+        # time.sleep(1)
         self.setup_valid(model)
 
     def setup_valid(self, model):
         self.model = model(self.vocab.size())
         self.model = get_cuda(self.model)
-        checkpoint = T.load(self.model_path)
+        # checkpoint = T.load(self.model_path)
+        checkpoint = T.load(self.model_path, map_location=lambda storage, loc: storage)
         self.model.load_state_dict(checkpoint["model_dict"])
 
 

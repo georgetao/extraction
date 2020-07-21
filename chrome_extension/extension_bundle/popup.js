@@ -196,7 +196,7 @@ document.getElementById('copy-clipboard').addEventListener('click', function() {
 	for (var i=0; i<tasks.length; i++) {
 		vals.push(tasks[i].childNodes[0].data);
 	}
-	var copyText = vals.join(", ");
+	var copyText = vals.join("\n");
 
 
 	var dummy = document.createElement('textarea');
