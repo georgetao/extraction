@@ -40,7 +40,7 @@ function add_one_item_to_todo(result, id_counter) {
 
 		tab_div.setAttribute("id", "item".concat(id_counter));
 		tab_div.setAttribute("data-parent", "#checklist");
-		card_body_div.className += "card-body";
+		card_body_div.className += "card-body extraction-dropdown-top-margin";
 
 		//TEXT GOES HERE
 		var inputText = document.createTextNode(result);
@@ -59,7 +59,7 @@ function add_one_item_to_todo(result, id_counter) {
 		itemText.setAttribute("name", "task");
 		itemText.appendChild(inputText);
 
-		tabButton.className += "fa fa-caret-down d-flex align-items-center";
+		tabButton.className += "fa fa-caret-down d-flex align-items-center extraction-dropdown-button";
 		tabButton.setAttribute("data-toggle", "collapse");
 		tabButton.setAttribute("data-target", "#item".concat(id_counter))
 
@@ -81,6 +81,7 @@ function add_one_item_to_todo(result, id_counter) {
 		}
 
 		var option3 = document.createElement("a");
+		option3.className += "extraction-dropdown-top-margin";
 		option3.appendChild(document.createTextNode("Move to Top"));
 		card_body_div.appendChild(option3);
 
