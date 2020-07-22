@@ -144,7 +144,7 @@ function summarize(email_text) {
 	  }
 	}
 
-	var cloud_fn_url = 'https://us-central1-sigma-smile-251401.cloudfunctions.net/classifier2'
+	var cloud_fn_url = 'https://us-central1-sigma-smile-251401.cloudfunctions.net/classify_summarize'
 
 	console.log(cloud_fn_url);
 	
