@@ -14,7 +14,7 @@ h3 {
 }
 
 .card-checklist {
-  background-color: #EBEBEB;
+  background-color: #f4f4f4;
   border: none;
   padding: 0px 0px 4.84px 0px;
 }
@@ -76,6 +76,7 @@ img {
   width:220px;
   font-size:20px;
   overflow-wrap: break-word;
+  background-color:#EBEBEB;
 }
 
 .text-action:hover{
@@ -106,7 +107,7 @@ img {
 .loader:before {
   width: 50%;
   height: 50%;
-  background: #FFC482;
+  background: #ffffff;
   border-radius: 100% 0 0 0;
   position: absolute;
   top: 0;
@@ -114,7 +115,7 @@ img {
   content: '';
 }
 .loader:after {
-  background: #fffaf0;
+  background: #E0E0E0;
   width: 75%;
   height: 75%;
   border-radius: 50%;
@@ -164,7 +165,7 @@ img {
 }
 
 .card-body {
-  padding: 0px 0px 10px 0px !important;
+  padding: 0px 20px 10px 20px !important;
 }
 
 .extraButtons {
@@ -183,6 +184,9 @@ img {
   margin: 4.84px 0px 0px 0px;
 }
 
+.extraction-dropdown-button {
+  background-color:#EBEBEB;
+}
 .extraction-dropdown-button:hover {
   background-color: #FFE2C2;
 }
