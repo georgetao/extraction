@@ -1,11 +1,16 @@
 document.getElementById("extractButton").addEventListener('click', () => {
     // alert("Popup DOM fully loaded and parsed");
 
+    if (isdocument.getElementById("myTextArea").value.length == 0) {
+            return;
+        }
+
     function modifyDOM() {
         var full_email_text = ""
         for (var i = 1; i<document.body.getElementsByTagName("P").length; i++) {
             full_email_text = full_email_text + document.body.getElementsByTagName("P")[i].textContent
         }
+        console.log(full_email_text);
         console.log("p elements text joined together")
         console.log(full_email_text)
         if (full_email_text == "") {
