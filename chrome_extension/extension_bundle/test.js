@@ -1,9 +1,9 @@
 document.getElementById("extractButton").addEventListener('click', () => {
     // alert("Popup DOM fully loaded and parsed");
 
-    if (isdocument.getElementById("myTextArea").value.length == 0) {
-            return;
-        }
+    // if (isdocument.getElementById("myTextArea").value.length == 0) {
+    //         return;
+    //     }
 
     function modifyDOM() {
         var full_email_text = ""
