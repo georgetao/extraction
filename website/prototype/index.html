@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html>
 <title>Test for Chrome Extension</title>
   <head>
@@ -10,16 +10,19 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="nodes/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="nodes/font-awesome/css/font-awesome.min.css">
-    <link rel="stylesheet" href="prototype/styles.css">
-   <!--  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> -->
+    <link rel="stylesheet" href="styles.css">
+    <link href='https://fonts.googleapis.com/css?family=Lato' rel='stylesheet'>
+    <!-- <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet"> -->
+    <!-- <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet"> -->  <!--  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> -->
   </head>
   <body>
     <div class="container">
       <div class="row">
         <div class="col-12">
-          <h3>Input Text:</h3>
-          <textarea id="myTextArea" name="myTextArea" rows="5" style="width:100%" placeholder="Paste Email Text Here"></textarea>
-          <a id="clickMe">Extract</a> <br>
+          <img src="img/popup_light_rec.png" alt="ExtrAction Logo - Rectangle" id="logo">
+          <textarea id="myTextArea" name="myTextArea" rows="5" placeholder="Paste Email Text Here"></textarea>
+          <a id="extractButton">Extract</a>
+          <br>
         </div>
       </div>
 
@@ -32,7 +35,7 @@
 
       <div class="row">
         <div class="col-12">
-          <h3>To Do</h3>
+          <h3>Action Items</h3>
         </div>
       </div>
 
@@ -78,11 +81,9 @@
 <!-- end of experiment -->
       </div>
       <div class="row">
-        <div class="col-2">
-          <a id="add-item" class="fa fa-plus"></a>
-        </div>
-        <div class="col-2">
-          <a id="copy-clipboard" class="fa fa-clipboard"></a>
+        <div class="col-12 extraButtons">
+          <a id="add-item" class="fa fa-plus square extraButtons-body"></a>
+          <a id="copy-clipboard" class="fa fa-clipboard square extraButtons-body"></a>
         </div>
       </div>
     </div>
@@ -92,7 +93,6 @@
         <div class="col-8" contenteditable="true">
           Todo #1.
         </div>
-
         <div class="col-2">
           <div class="dropdown">
             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -107,12 +107,10 @@
           </div>
         </div>
       </div>
-
       <div class="row">
         <div class="col-8">
           Todo #2.
         </div>
-
         <div class="col-2">
           <div class="dropdown">
             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -131,11 +129,8 @@
   </body>
 
     <!-- jQuery first, then Popper.js, then Bootstrap JS. -->
-  <script src="prototype/nodes/jquery/dist/jquery.slim.min.js"></script>
-  <script src="prototype/nodes/popper.js/dist/umd/popper.min.js"></script>
-  <script src="prototype/nodes/bootstrap/dist/js/bootstrap.min.js"></script>
-  <script type="text/javascript" src="prototype/popup.js" defer></script>
+  <script src="nodes/jquery/dist/jquery.slim.min.js"></script>
+  <script src="nodes/popper.js/dist/umd/popper.min.js"></script>
+  <script src="nodes/bootstrap/dist/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="popup.js" defer></script>
 </html>
-
-
-
