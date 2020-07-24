@@ -40,6 +40,7 @@ h3 {
   margin: 0;
   padding: 0;
 }*/
+
 textarea {
   height:100px;
   width:200px;
@@ -74,10 +75,11 @@ img {
 }
 
 .text-action{
-  width:220px;
-  font-size:20px;
+  width:460px;
+  font-size:18px;
   overflow-wrap: break-word;
-  background-color:#EBEBEB;
+  background-color:#E0E0E0;
+  font-weight:bold;
 }
 
 .text-action:hover{
@@ -170,8 +172,7 @@ img {
 
 #extractButton{
   background-color: #E0E0E0; /* fffaf0 */
-  /*color:black;*/
-  /*color: #FFC482;*/
+  font-size:20px;
 }
 
 #extractButton:hover{
@@ -186,6 +187,7 @@ img {
   padding: 0px 4.84px 0px 15px;
   background-color: inherit;
   color:inherit;
+  width:400px;
 }
 
 .square {
