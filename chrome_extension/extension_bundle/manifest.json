@@ -5,7 +5,7 @@
   "permissions": [
     "activeTab",
     "identity", 
-    "https://us-central1-sigma-smile-251401.cloudfunctions.net/classifier/*"
+    "https://us-central1-sigma-smile-251401.cloudfunctions.net/classifier2/*"
   ],
   "description": "The goal is to be able to extract tasks and summarize them.",
   "content_security_policy": "script-src 'self' https://apis.google.com/js/api.js; object-src 'self'",
