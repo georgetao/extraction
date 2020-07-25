@@ -5,7 +5,6 @@
   border-radius: 8px;
   font-family: 'Lato';
   color: #585858;
-  /*color:#3D3D3D;*/
   padding:15px 0px 15px 0px;
   overflow-y:auto;
 }
@@ -70,7 +69,6 @@ img {
 
 .tab-checklist{
   display:flex;
-
   justify-content: space-between;
 }
 
@@ -171,7 +169,7 @@ img {
 }
 
 #extractButton{
-  background-color: #E0E0E0; /* fffaf0 */
+  background-color: #E0E0E0;
   font-size:20px;
 }
 
@@ -184,7 +182,7 @@ img {
 }
 
 .extraButtons {
-  padding: 0px 4.84px 0px 15px;
+  padding: 0px 5px 0px 15px;
   background-color: inherit;
   color:inherit;
   width:400px;
@@ -197,7 +195,7 @@ img {
 }
 
 .extraction-dropdown-top-margin {
-  margin: 4.84px 0px 0px 0px;
+  margin: 5px 0px 0px 0px;
 }
 
 .extraction-dropdown-button {
@@ -214,5 +212,3 @@ img {
 .extraButtons-body:hover {
   background-color: #FFE2C2;
 }
-
-#
