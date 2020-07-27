@@ -45,7 +45,7 @@ p {
 
 .site-heading .site-heading-lower {
   font-size: 5rem;
-  font-weight: 100;
+  font-weight: 300;
   line-height: 4rem;
 }
 
@@ -70,6 +70,11 @@ p {
   font-weight: 300;
   text-align: center;
 
+}
+
+.bg-faded-home {
+  background-color: rgba(255, 255, 255, 0.85);
+  height: 300px;
 }
 
 .bg-faded {
@@ -182,15 +187,32 @@ p {
 }
 
 @media (min-width: 992px) {
-  .product-item .product-item-title {
+  .prototype-heading .prototype-heading-content {
+    margin-top: -5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .prototype-heading .product-item-title {
     position: relative;
     z-index: 1;
     margin-bottom: -3rem;
   }
-  .product-item .product-item-img {
+
+  .prototype-item {
+    margin-left:auto;
+    margin-right:auto;
+    text-align:center;
+    margin-top:-65px;
+    margin-bottom:10px;
+  }
+
+  .prototype-item .prototype-test{
     position: relative;
-    z-index: 0;
-    max-width: 60vw;
+    z-index: 1;
+    width: 600px;
+    height:400px;
+    margin:auto;
   }
   .product-item .product-item-description {
     position: relative;
@@ -314,9 +336,9 @@ p {
 }
 
 .team .team_member .team_img img{
-  width: 160px;
-  height: 160px;
+  width: 145px;
+  height: 145px;
   padding: 5px;
-  margin-top:-507px;
-  margin-left:-5px;
+  margin-top:-505px;
+  margin-left:0px;
 }
