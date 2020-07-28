@@ -5,7 +5,6 @@
   border-radius: 8px;
   font-family: 'Lato';
   color: #585858;
-  /*color:#3D3D3D;*/
   padding:15px 0px 15px 0px;
 }
 
@@ -68,15 +67,15 @@ img {
 
 .tab-checklist{
   display:flex;
-
   justify-content: space-between;
 }
 
 .text-action{
   width:220px;
-  font-size:20px;
+  font-size:18px;
   overflow-wrap: break-word;
-  background-color:#EBEBEB;
+  background-color:#E0E0E0;
+  font-weight:bold;
 }
 
 .text-action:hover{
@@ -154,11 +153,22 @@ img {
    cursor: default;
 }
 
+#logo {
+  width:150px;
+  height:75px; 
+  margin-bottom:10px; 
+  margin-left:auto; 
+  margin-right:auto; 
+  display:block;
+}
+
+#myTextArea {
+  width:100%;
+}
+
 .extractButton{
   background-color: #E0E0E0; /* fffaf0 */
-  margin: 0px 0px 5px 0px;
-  /*color:black;*/
-  /*color: #FFC482;*/
+  font-size:20px;
 }
 
 .extractButton:hover{
@@ -170,7 +180,7 @@ img {
 }
 
 .extraButtons {
-  padding: 0px 4.84px 0px 15px;
+  padding: 0px 5px 0px 15px;
   background-color: inherit;
   color:inherit;
 }
@@ -182,7 +192,7 @@ img {
 }
 
 .extraction-dropdown-top-margin {
-  margin: 4.84px 0px 0px 0px;
+  margin: 5px 0px 0px 0px;
 }
 
 .extraction-dropdown-button {
