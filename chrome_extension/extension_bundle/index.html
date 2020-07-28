@@ -22,13 +22,11 @@
           <img src="img/popup_light_rec.png" alt="ExtrAction Logo - Rectangle" id="logo">
           <textarea id="myTextArea" name="myTextArea" rows="5" placeholder="Paste Email Text Here"></textarea>
         </div>
-        <div class="col-6" style="padding-right:5px;">
-          <a id="extractButton" class="extractButton">POPUP.JS BUTTON</a>
-          <br>
+        <div class="col-6 d-flex align-items-stretch" style="padding-right:5px; margin-bottom:10px">
+          <a id="extractButton" class="extractButton">Extract from Text Box</a>
         </div>
-        <div class="col-6" style="padding-left:0px;">
-          <a id="extractFromEmail" class="extractButton">TEST.JS BUTTON</a>
-          <br>
+        <div class="col-6 d-flex align-items-stretch" style="padding-left:0px; margin-bottom:10px">
+          <a id="extractFromEmail" class="extractButton">Extract from Page</a>
         </div>
       </div>
 
@@ -88,9 +86,9 @@
       </div>
       <div class="row">
         <div class="col-12 extraButtons">
-          <a id="add-item" class="fa fa-plus square extraButtons-body"></a>
-          <a id="copy-clipboard" class="fa fa-clipboard square extraButtons-body"></a>
-          <a id="clear-textbox" class="fa fa-eraser square extraButtons-body"></a>
+          <a id="add-item" class="fa fa-plus square extraButtons-body" data-toggle="tooltip" title="Add an item"></a>
+          <a id="copy-clipboard" class="fa fa-clipboard square extraButtons-body" data-toggle="tooltip" title="Copy to clipboard"></a>
+          <a id="clear-textbox" class="fa fa-eraser square extraButtons-body" data-toggle="tooltip" title="Clear text box"></a>
         </div>
       </div>
     </div>
@@ -141,4 +139,8 @@
   <script src="nodes/bootstrap/dist/js/bootstrap.min.js"></script>
   <script type="text/javascript" src="popup.js" defer></script>
   <script type="text/javascript" src="test.js"></script>
+
+  <script>
+    $('[data-toggle="tooltip"]').tooltip();
+  </script>
 </html>
