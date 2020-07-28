@@ -226,6 +226,10 @@ document.getElementById('copy-clipboard').addEventListener('click', function() {
 	document.body.removeChild(dummy);
 })
 
+document.getElementById('clear-textbox').addEventListener('click', function() {
+	var textBox = document.getElementById("myTextArea");
+	textBox.value = "";
+})
 // document.getElementById('clickMe').addEventListener('click', summarize);
 
 
