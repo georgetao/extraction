@@ -1,0 +1,27 @@
+---
+title: ""
+output: html_notebook
+---
+
+
+### A Notebook for creating presentation visuals
+
+```{r}
+# imports
+library(ggplot2)
+```
+
+
+
+```{r}
+d = data.frame(f1 = c(.38, .50, .55, .62, .64), t = 1:5)
+p <- ggplot(data = d, aes(x=t, y=f1)) +
+  geom_line(color='skyblue3') +
+  geom_point(color='skyblue3') +
+  ylim(.35, .67) +
+  geom_text(aes(label=f1), hjust=0.2, vjust=2)
+  
+p
+  
+```
+
