@@ -91,6 +91,12 @@
           <a id="clear-textbox" class="fa fa-eraser square extraButtons-body" data-toggle="tooltip" title="Clear text box"></a>
         </div>
       </div>
+      <div class="row">
+        <div class="col-12">
+          <input type="checkbox" name="tooltip-toggle" checked>
+          <label>Toggle Tooltip</label>
+        </div>
+      </div>
     </div>
 
 <!--     <div class="container" id="checklist">
@@ -141,6 +147,16 @@
   <script type="text/javascript" src="test.js"></script>
 
   <script>
-    $('[data-toggle="tooltip"]').tooltip();
+    $(document).ready(function() {
+      $('[data-toggle="tooltip"]').tooltip('enable');
+      $('input[type=checkbox]').click(function() {
+        if($(this).prop("checked") == true){
+          $('[data-toggle="tooltip"]').tooltip('enable');
+        }
+        if($(this).prop("checked") == false){
+          $('[data-toggle="tooltip"]').tooltip('disable');
+        }
+      })
+    })
   </script>
 </html>
