@@ -9,12 +9,20 @@ output: html_notebook
 ```{r}
 # imports
 library(ggplot2)
+library(sysfonts)
+library(showtext)
+library(dplyr)
+```
+
+```{r}
+
 ```
 
 
 
+
 ```{r}
-d = data.frame(f1 = c(.38, .50, .55, .62, .64), t = 1:5)
+d = data.frame(f1 = c(.38, .51, .56, .62, .64), t = 1:5)
 p <- ggplot(data = d, aes(x=t, y=f1)) +
   geom_line(color='skyblue3') +
   geom_point(color='skyblue3') +
@@ -24,4 +32,91 @@ p <- ggplot(data = d, aes(x=t, y=f1)) +
 p
   
 ```
+
+```{r}
+# plot Q1
+font_add_google("Barlow Semi Condensed", "Barlow Semi Condensed")
+
+d <- data.frame(
+  percentage = c('0-25%', '25-50%', '50-75%', '75-100%'),
+  portion = c(18,33,40,9)
+)
+
+ggplot(d, aes(x=percentage, y=portion)) +
+  geom_bar(stat='identity', color="NA", fill=c("grey68", "skyblue3", "grey68", "grey68")) +
+  scale_x_discrete(limits = rev(levels(d$percentage))) +
+  geom_text(aes(label = paste0(d$portion,"%")), color = "white", position="identity", hjust = 1.1, size=10, family = "Barlow Semi Condensed", fontface = "bold") +
+  coord_flip() +
+  theme(
+    panel.border = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.background = element_rect(fill="#F3F3F3", linetype="blank"),
+    axis.title.x=element_blank(),
+    axis.text.x=element_blank(),
+    axis.ticks.x=element_blank(),
+    axis.title.y=element_blank(),
+    axis.text.y=element_blank(),
+    # axis.text.y=element_text(color = "grey20", size = 35, hjust = .5, family = "Barlow Semi Condensed"),
+    axis.ticks.y=element_blank())
+```
+
+
+
+
+
+```{r}
+# plot Q2
+font_add_google("Barlow Semi Condensed", "Barlow Semi Condensed")
+
+d <- data.frame(
+  percentage = c('Yes', 'Probably', 'Maybe', 'Probably Not', 'No'),
+  portion = c(24,40,36,0.1,0.1),
+  true_portion = c(24,40,36,0,0)
+)
+
+# d <- data.frame(
+#   percentage = c('Yes', 'Probably', 'Maybe'),
+#   portion = c(24,40,36)
+# )
+
+d %>% 
+  mutate(percentage = factor(percentage, levels = rev(c('Yes', 'Probably', 'Maybe', 'Probably Not', 'No')))) %>%
+ggplot(aes(x=percentage, y=portion)) +
+  geom_bar(stat='identity', 
+           color="NA", 
+           fill=c("grey68", "grey68", "grey68", "skyblue3", "grey68"), 
+           width = 0.9,
+           position="stack")  +
+  geom_text(aes(label = paste0(d$true_portion,"%")), 
+            # color = "white", 
+            position="identity", 
+            # hjust = 1.1, 
+            hjust = ifelse(d$portion > 3, 1.1, -0.3), 
+            colour = ifelse(d$portion > 3, "white", "grey62"),
+            size=10, 
+            family = "Barlow Semi Condensed", 
+            fontface = "bold") +
+  coord_flip() +
+  theme(
+    panel.border = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.background = element_rect(fill="#F3F3F3", linetype="blank"),
+    axis.title.x=element_blank(),
+    axis.text.x=element_blank(),
+    axis.ticks.x=element_blank(),
+    axis.title.y=element_blank(),
+    axis.text.y=element_blank(),
+    # axis.text.y=element_text(color = "grey20", size = 35, hjust = .5, family = "Barlow Semi Condensed"),
+    axis.ticks.y=element_blank())
+```
+
+
+```{r}
+survey = read_csv('ExtrAction Interest Survey')
+```
+
+
+
 
