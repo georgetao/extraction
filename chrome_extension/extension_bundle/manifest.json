@@ -13,7 +13,7 @@
             "48": "img/Rainbow_Logo_square.png",
             "128": "img/Rainbow_Logo_square.png" },
   "browser_action": {
-   "default_icon": "img/Rainbow_Logo_square_white.png",
+   "default_icon": "img/Rainbow_Logo_square.png",
    "default_title": "Working model of the baseline extension",
    "default_popup": "index.html"
   },
