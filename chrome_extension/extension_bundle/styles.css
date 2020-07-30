@@ -166,12 +166,12 @@ img {
   width:100%;
 }
 
-.extractButton{
+#extractButton{
   background-color: #E0E0E0; /* fffaf0 */
   font-size:15px;
 }
 
-.extractButton:hover{
+#extractButton:hover{
   background-color:#FFE2C2;
 }
 

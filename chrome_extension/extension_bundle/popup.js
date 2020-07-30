@@ -69,14 +69,7 @@ function add_one_item_to_todo(result, id_counter) {
 
 	//DROPDOWN LINKS
 	var option0 = document.createElement("span");
-	option0.appendChild(document.createTextNode("Sender: "));
-
-	var option0_child = document.createElement("span");
-	option0_child.setAttribute("contenteditable", "true");
-	option0_child.appendChild(document.createTextNode("Extraction"));
-	
-	option0.appendChild(option0_child);
-
+	option0.appendChild(document.createTextNode("Sender: EXTRACTION"));
 	card_body_div.appendChild(option0);
 
 	// var option1 = document.createElement("a");
@@ -121,7 +114,7 @@ function add_to_todo(results) {
 function start () {
 	var extractButton = document.getElementById("extractButton");
 	extractButton.innerHTML = "";
-	extractButton.className += " inactiveLink";
+	extractButton.className = "inactiveLink";
 	
 	var load_div = document.createElement("div");
 	load_div.className = "loader";
@@ -187,8 +180,8 @@ function summarize(email_text) {
 
 	  	// Changing loading spinner back to normal
 	  	extractButton = document.getElementById("extractButton");
-	  	extractButton.innerHTML = "POPUP.JS BUTTON";
-		extractButton.className = "extractButton";
+	  	extractButton.innerHTML = "Extract";
+		extractButton.className = "";
 	  })
 	  .catch(function (error) {
 	    alert(error);
@@ -204,14 +197,7 @@ document.getElementById('add-item').addEventListener('click', function() {
 document.getElementById('copy-clipboard').addEventListener('click', function() {
 	var tasks = document.getElementsByName("task");
 	var vals = [];
-
-	var checklist_items = document.getElementById("checklist").children;
-
-	for (var i=0; i<checklist_items.length; i++) {
-		if (checklist_items[i].style.display == "none") {
-			console.log("continue");
-			continue;
-		}
+	for (var i=0; i<tasks.length; i++) {
 		vals.push(tasks[i].childNodes[0].data);
 	}
 	var copyText = vals.join("\n");
