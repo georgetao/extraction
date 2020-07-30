@@ -1,4 +1,4 @@
-document.getElementById("extractButton").addEventListener('click', () => {
+document.getElementById("extractFromEmail").addEventListener('click', () => {
     // alert("Popup DOM fully loaded and parsed");
 
     // if (isdocument.getElementById("myTextArea").value.length == 0) {
