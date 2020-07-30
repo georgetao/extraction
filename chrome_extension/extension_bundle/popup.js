@@ -216,6 +216,18 @@ document.getElementById('clear-textbox').addEventListener('click', function() {
 	var textBox = document.getElementById("myTextArea");
 	textBox.value = "";
 })
+
+$(document).ready(function() {
+  $('[data-toggle="tooltip"]').tooltip('enable');
+  $('input[type=checkbox]').click(function() {
+    if($(this).prop("checked") == true){
+      $('[data-toggle="tooltip"]').tooltip('enable');
+    }
+    if($(this).prop("checked") == false){
+      $('[data-toggle="tooltip"]').tooltip('disable');
+    }
+  })
+})
 // document.getElementById('clickMe').addEventListener('click', summarize);
 
 
