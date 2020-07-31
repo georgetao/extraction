@@ -168,12 +168,16 @@ img {
   width:100%;
 }
 
-#extractButton{
+.extractButton{
   background-color: #E0E0E0;
-  font-size:20px;
+  font-size:15px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  /*text-align: center;*/
 }
 
-#extractButton:hover{
+.extractButton:hover{
   background-color:#FFE2C2;
 }
 

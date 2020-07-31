@@ -1,6 +1,6 @@
  <!DOCTYPE html>
 <html>
-<title>Test for Chrome Extension</title>
+<title>Index for Extraction Website</title>
   <head>
         <!-- Required meta tags always come first -->
     <meta charset="utf-8">
@@ -19,10 +19,18 @@
     <div class="container">
       <div class="row">
         <div class="col-12">
-          <img src="img/popup_light_rec.png" alt="ExtrAction Logo - Rectangle" id="logo">
+          <img src="img/Rainbow_Logo_v1.png" alt="ExtrAction Logo - Rainbow Rectangle" id="logo">
           <textarea id="myTextArea" name="myTextArea" rows="5" placeholder="Paste Email Text Here"></textarea>
-          <a id="extractButton">Extract</a>
           <br>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-6" style="padding-right:2.5px; margin-bottom:10px; text-align:center;">
+          <a id="extractButton" class="extractButton">Extract from Text Box</a>
+        </div>
+        <div class="col-6" style="padding-left:2.5px; margin-bottom:10px">
+          <a id="extractFromEmail" class="extractButton">Extract from Page</a>
         </div>
       </div>
 
@@ -82,8 +90,15 @@
       </div>
       <div class="row">
         <div class="col-12 extraButtons">
-          <a id="add-item" class="fa fa-plus square extraButtons-body"></a>
-          <a id="copy-clipboard" class="fa fa-clipboard square extraButtons-body"></a>
+          <a id="add-item" class="fa fa-plus square extraButtons-body" data-toggle="tooltip" title="Add an item"></a>
+          <a id="copy-clipboard" class="fa fa-clipboard square extraButtons-body" data-toggle="tooltip" title="Copy to clipboard"></a>
+          <a id="clear-textbox" class="fa fa-eraser square extraButtons-body" data-toggle="tooltip" title="Clear text box"></a>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <input type="checkbox" name="tooltip-toggle" checked>
+          <label>Toggle Tooltip</label>
         </div>
       </div>
     </div>

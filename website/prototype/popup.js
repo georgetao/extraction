@@ -69,7 +69,14 @@ function add_one_item_to_todo(result, id_counter) {
 
 	//DROPDOWN LINKS
 	var option0 = document.createElement("span");
-	option0.appendChild(document.createTextNode("Sender: EXTRACTION"));
+	option0.appendChild(document.createTextNode("Sender: "));
+
+	var option0_child = document.createElement("span");
+	option0_child.setAttribute("contenteditable", "true");
+	option0_child.appendChild(document.createTextNode("Extraction"));
+
+	option0.appendChild(option0_child);
+
 	card_body_div.appendChild(option0);
 
 	// var option1 = document.createElement("a");
@@ -114,7 +121,7 @@ function add_to_todo(results) {
 function start () {
 	var extractButton = document.getElementById("extractButton");
 	extractButton.innerHTML = "";
-	extractButton.className = "inactiveLink";
+	extractButton.className += " inactiveLink";
 	
 	var load_div = document.createElement("div");
 	load_div.className = "loader";
@@ -148,9 +155,7 @@ function summarize(email_text) {
 
 	console.log(cloud_fn_url);
 	
-	const proxyurl = "https://cors-anywhere.herokuapp.com/";
-
-	return fetch(proxyurl + cloud_fn_url, {
+	return fetch(cloud_fn_url, {
 	    method: 'post',
 	    headers: {
 	      'Accept': 'application/json',
@@ -182,8 +187,8 @@ function summarize(email_text) {
 
 	  	// Changing loading spinner back to normal
 	  	extractButton = document.getElementById("extractButton");
-	  	extractButton.innerHTML = "Extract";
-		extractButton.className = "";
+	  	extractButton.innerHTML = "Extract from Text Box";
+		extractButton.className = "extractButton";
 	  })
 	  .catch(function (error) {
 	    alert(error);
@@ -199,10 +204,19 @@ document.getElementById('add-item').addEventListener('click', function() {
 document.getElementById('copy-clipboard').addEventListener('click', function() {
 	var tasks = document.getElementsByName("task");
 	var vals = [];
-	for (var i=0; i<tasks.length; i++) {
-		vals.push(tasks[i].childNodes[0].data);
-	}
+
+	var checklist_items = document.getElementById("checklist").children;
+
+	for (var i=0; i<checklist_items.length; i++) {
+		if (checklist_items[i].style.display == "none") {
+			console.log("continue");
+			continue;
+		}
+		else {
+			vals.push(tasks[i].childNodes[0].data);
+		}
 	var copyText = vals.join("\n");
+	}	
 
 
 	var dummy = document.createElement('textarea');
@@ -214,6 +228,22 @@ document.getElementById('copy-clipboard').addEventListener('click', function() {
 	document.body.removeChild(dummy);
 })
 
+document.getElementById('clear-textbox').addEventListener('click', function() {
+	var textBox = document.getElementById("myTextArea");
+	textBox.value = "";
+})
+
+$(document).ready(function() {
+  $('[data-toggle="tooltip"]').tooltip('enable');
+  $('input[type=checkbox]').click(function() {
+    if($(this).prop("checked") == true){
+      $('[data-toggle="tooltip"]').tooltip('enable');
+    }
+    if($(this).prop("checked") == false){
+      $('[data-toggle="tooltip"]').tooltip('disable');
+    }
+  })
+})
 // document.getElementById('clickMe').addEventListener('click', summarize);
 
 
