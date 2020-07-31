@@ -244,6 +244,15 @@ $(document).ready(function() {
     }
   })
 })
+
+document.getElementById('test').addEventListener('click', function () {
+// function test () {
+	var largeImage = document.getElementById('largeImage');
+	var url=largeImage.getAttribute('src');
+	window.open(url)
+}
+)
+
 // document.getElementById('clickMe').addEventListener('click', summarize);
 
 

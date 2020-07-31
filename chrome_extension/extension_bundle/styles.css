@@ -38,6 +38,7 @@ h3 {
   margin: 0;
   padding: 0;
 }*/
+
 textarea {
   height:100px;
   width:200px;
@@ -55,14 +56,54 @@ a {
   border-radius:5px;
 }
 
-a:hover {
+a span {
+  display: none;
+  padding: initial;
+  text-decoration: initial;
+  border-style:initial;
+  border-width:initial;
+  text-align:initial;
+  font-weight:initial;
+  color:initial;
+  border-radius:5px;
+}
+
+a:hover span { 
+  display:block; 
+}
+
+/*a:hover {
   background-color: #FFE2C2;
   color: white;
   cursor: pointer;
+}*/
+
+button {
+  /*width:30px;*/
+  display: none;
 }
 
-img {
-  width:30px;
+.circle {
+  width:20px;
+  height: 20px;
+  border-radius:50%;
+  font-size:13px;
+  font-style: bold;
+  background-color: #E0E0E0;
+  line-height: 20px;
+  text-align: center;
+  line-align: center;
+  vertical-align: text-top;
+  /*float: right; Default is left.*/ 
+  border-style: solid;
+  border-width: 1px;
+  border-color: black;
+  font-family: 'Lato';
+  font-weight: 900;
+}
+
+.circle:hover {
+  background-color:#FFE2C2;
 }
 
 .tab-checklist{
@@ -177,6 +218,8 @@ img {
 
 .extractButton:hover{
   background-color:#FFE2C2;
+  color: white;
+  cursor: pointer;
 }
 
 .card-body {
