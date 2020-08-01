@@ -245,11 +245,11 @@ $(document).ready(function() {
   })
 })
 
-document.getElementById('test').addEventListener('click', function () {
+document.getElementById('helpButton').addEventListener('click', function () {
 // function test () {
-	var largeImage = document.getElementById('largeImage');
-	var url=largeImage.getAttribute('src');
-	window.open(url)
+	// var largeImage = document.getElementById('largeImage');
+	// var url="img/ExtrAction_Help_Guide.png";
+	window.open("img/ExtrAction_Help_Guide.png")
 }
 )
 
