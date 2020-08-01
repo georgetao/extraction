@@ -26,9 +26,8 @@
   <body>
 
     <h1 class="site-heading text-center text-white d-none d-lg-block">
-    <span class="site-heading-upper text-primary mb-3">ExtrAction</span>
-    <span class="site-heading-lower">Automatic Email Request Summarizations</span>
-  </h1>
+      <a href="index.html"><img id="logo" src="img/Rainbow_Logo_rec_transparent.png" alt=""></a>
+    </h1>
 
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark py-lg-4" id="mainNav">
@@ -39,7 +38,7 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarResponsive">
         <ul class="navbar-nav mx-auto">
-          <li class="nav-item active px-lg-4">
+          <li class="nav-item px-lg-4">
             <a class="nav-link text-uppercase text-expanded" href="index.html">Home
               <span class="sr-only">(current)</span>
             </a>
@@ -50,7 +49,7 @@
           <li class="nav-item px-lg-4">
             <a class="nav-link text-uppercase text-expanded" href="prototype.html">Prototype</a>
           </li>
-          <li class="nav-item px-lg-4">
+          <li class="nav-item active px-lg-4">
             <a class="nav-link text-uppercase text-expanded" href="technical.html">Technical</a>
           </li>
         </ul>
@@ -58,33 +57,31 @@
     </div>
   </nav>
 
+  <section class="page-section prototype-heading">
+    <div class="prototype-heading-content">
+        
+        <div class="col-xl-9 col-lg-10 mx-auto" style="height:100px; margin_bottom:-50px;">
+            <div class="bg-faded rounded p-5">
+              <h2 class="section-heading mb-4">
+                <span class="section-heading-lower">Technical Discussion</span>
+              </h2>
+            </div>
+        </div>
+      </div>
+  </section>
+
     <section class="page-section cta">
       <div class="container">
         <div class="row">
           <div class="col-xl-9 mx-auto">
             <div class="cta-inner text-center rounded">
               <h2 class="section-heading mb-5">
-                <span class="section-heading-upper">Our Models</span>
-                <span class="section-heading-lower">Technical Approach</span>
+                <span class="section-heading-upper">Our</span>
+                <span class="section-heading-lower">Goals</span>
               </h2>
-              <p>ExtrAction is a tool that summarizes relevant action items in emails and provides them to the user in an easy-to-use format.  It is built on two different natural language processing models.  The first, a classification model, classfies each sentence in the email as containing an action item or not.  The second model summarizes each action sentence into a to-do list item.</p>
+              <p>To enable our project vision, we, <a href="about.html">the ExtrAction team</a>, need to build a system that is able to detect action items present in a given email, and then summarize them appropriately. We approached these two actions using two steps using two core NLP tasks: text classification and text summarization. Text classification is used to determine which sentences contain action items and then text summarization is used to make a succinct summary of each action item. </p>
               <br>
-              <p>The classification model we are using is something.  It was trained on something.</p>
-              <br>
-              <p>The request summarization model is something.  It was trained on a custom dataset of email action items.</p>
-              <br>
-<!--               <ul class="list-unstyled list-hours mb-5 text-left mx-auto">
-                <li class="list-unstyled-item list-hours-item d-flex">
-                  Sentence Classification
-                </li>
-                <li>lwiefsdj jaifdsj</li>
-                <li class="list-unstyled-item list-hours-item d-flex">
-                  Request Summarization
-                  <span class="ml-auto">7:00 AM to 8:00 PM</span>
-                </li>
-              </ul> -->
-              <p class="address mb-5">
-                
+              <p class="address mb-5" style="text-align: center">
                   <strong>Github</strong>
                   <br>
                   Check back here to check out our repo!
@@ -97,19 +94,38 @@
 
     <section class="page-section about-heading">
       <div class="container">
-        <img class="img-fluid rounded about-heading-img mb-3 mb-lg-0" src="img/about.jpg" alt="">
+<!--         <div class="tech_img"> -->
+          <img class="img-fluid rounded about-heading-img-main mb-3 mb-lg-0" src="img/t0.jpg" alt="" style="margin-top:-60px;">
+<!--         </div> -->
         <div class="about-heading-content">
           <div class="row">
             <div class="col-xl-9 col-lg-10 mx-auto">
-              <div class="bg-faded rounded p-5">
+              <div class="bg-faded text-center rounded p-5" style="margin-top:100px">
                 <h2 class="section-heading mb-4">
-                  <span class="section-heading-upper">The Enron Corpus</span>
-                  <span class="section-heading-lower">Ethical Considerations</span>
+                  <span class="section-heading-lower">The Data</span>
                 </h2>
-                <p>Founded in 1987 by the Hernandez brothers, our establishment has been serving up rich coffee sourced from artisan farmers in various regions of South and Central America. We are dedicated to travelling the world, finding the best coffee, and bringing back to you here in our cafe.</p>
-                <p class="mb-0">We guarantee that you will fall in
-                  <em>lust</em>
-                  with our decadent blends the moment you walk inside until you finish your last sip. Join us for your daily routine, an outing with friends, or simply just to enjoy some alone time.</p>
+            <div class="product-item-description d-flex mr-auto">
+              <div class="bg-faded p-5 rounded" style="height:auto; margin-top:10px;">
+                <p class="mb-0">Our task requires us to create both a text classifier and a text summarizer, and therefore requires two distinct datasets to train each of these models. To curate these two specialized datasets, we draw natural language data from one primary source: the Enron Email Corpus1, a dataset of approximately 500,000 naturally written emails from the Enron Corporation in the early 2000s. It is currently the largest publicly available collection of naturally written language in an organizational setting.</p>
+              </div>
+            </div>
+            <img class="img-fluid rounded about-heading-img mb-3 mb-lg-0" src="img/t1.jpg" alt="" style="margin-top: 10px;">
+            <div class="product-item-description d-flex mr-auto">
+              <div class="bg-faded p-5 rounded" style="height:auto; margin-top:0px;">
+                <h4>Action Sentence Detection Dataset:</h4>
+                <p class="mb-0">The text classification required for ExtrAction is classifying whether or not a particular piece of text contains an action item. The piece of text serving as our unit of analysis is the sentence. It is possible for multiple distinct action items to be expressed in a single sentence and also for a single sentence’s action item to depend heavily on previous sentences. However, according to our preliminary analyses and exploration, the sentence remains the unit most likely to contain exactly one distinct action item. Therefore, we proceeded to assemble a dataset of sentences and associated 1/0 labels indicating whether there is an action item present in the sentence. For short, we refer to a sentence containing an action item as an action sentence.</p>
+                <br>
+                <p class="mb-0">To create this dataset, we merged disparate labeled portions of the Enron Corpus. The most important of which is the EPA dataset2 for addressee tagging created by researchers at Microsoft. The dataset is a list of enron email messages containing highlighted sections which express a task which the sender asked the user to complete. We created a parser using Python to retrieve the sentence to which the highlighted task belongs as well up to 3 sentences that came before the action sentence. To balance out the positives, we pulled negative examples (non-action sentences) from Email Intent Dataset and from Parakweet Labs the UC Berkeley Enron Email Analysis Project. </p>
+                <br>
+                <br>
+                <h4>Action Item Summarization Dataset:</h4>
+                <p class="mb-0">The next dataset we created associated an action sentence and its up to 3 sentences that preceded it with a summary of the action item. We include up to 3 preceding sentences because they tend to contain details that are important to fully understanding the action item. </p>
+                <br>
+                <p class="mb-0">To curate this dataset, members of our team together annotated approximately 4,000 action sentences with action item summaries. To minimize influence of members’ personal linguistic signatures in the summaries, we collectively adhered to a set of agreed upon guidelines when summarizing the action items. The primary principles to which the members agreed emphasized clarity, conciseness, and attractiveness (using words present in the text). </p>
+                <br>
+                <p class="mb-0">Finally, to supplement our dataset of 4,000 instances we used the Wikihow Summarization Dataset, consisting of article paragraphs and their 2nd person, prescriptive summaries. We use nearly 1 million instances from the WikiHow dataset for pre-training before fine-tuning the model on our own curated dataset. </p>
+              </div>
+            </div>
               </div>
             </div>
           </div>
@@ -117,21 +133,149 @@
       </div>
     </section>
 
-    <section class="page-section">
+    <section class="page-section about-heading">
+      <div class="container">
+        <div class="about-heading-content">
+          <div class="row">
+            <div class="col-xl-9 col-lg-10 mx-auto">
+              <div class="bg-faded text-center rounded p-5" style="margin-top:50px">
+                <h2 class="section-heading mb-4">
+                  <span class="section-heading-lower">Data Architecture</span>
+                </h2>
+            <img class="img-fluid rounded about-heading-img mb-3 mb-lg-0" src="img/t2.jpg" alt="">
+            <div class="product-item-description d-flex mr-auto">
+              <div class="bg-faded p-5 rounded" style="height:auto;">
+                <p class="mb-0">Here's an illustration of how a message is processed from when it gets scraped to when it gets served back to the user in a To-Do list format.</p>
+              </div>
+            </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page-section about-heading">
+      <div class="container">
+        <div class="about-heading-content">
+          <div class="row">
+            <div class="col-xl-9 col-lg-10 mx-auto">
+              <div class="bg-faded text-center rounded p-5" style="margin-top:50px">
+                <h2 class="section-heading mb-4">
+                  <span class="section-heading-lower">Classification Model</span>
+                </h2>
+            <!-- <img class="img-fluid rounded about-heading-img mb-3 mb-lg-0" src="img/t2.jpg" alt=""> -->
+            <div class="product-item-description d-flex mr-auto">
+              <div class="bg-faded p-5 rounded" style="height:auto;">
+                <p class="mb-0">We chose to use fastText, a hierarchical text classification model developed in the Facebook AI Research Lab, after comparing it to multiple baseline and deep learning models.  We found fastText to be on par with the deep learning models in terms of accuracy while also being extremely fast and easy to train.</p>
+                <br>
+                <p class="mb-0">For ExtrAction, computational efficiency is especially important because the model will have to evaluate in real time on multiple sentences.  fastText is efficient on large datasets because it is a hierarchical classifier.  Categories are arranged on a tree which reduces training and testing time from linear to logarithmic.  Additionally, the tree is built using the Huffman algorithm which leads to more computational efficiency by allowing the model to exploit natural class imbalances.</p>
+              </div>
+            </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page-section about-heading">
+      <div class="container">
+        <div class="about-heading-content">
+          <div class="row">
+            <div class="col-xl-9 col-lg-10 mx-auto">
+              <div class="bg-faded text-center rounded p-5" style="margin-top:50px">
+                <h2 class="section-heading mb-4">
+                  <span class="section-heading-lower">Summarization Model</span>
+                </h2>
+            <div class="product-item-description d-flex mr-auto">
+              <div class="bg-faded p-5 rounded" style="height:auto;">
+                <p class="mb-0">After considering both performance and pre-existing libraries available to us, we eventually settled on using a Pointer-Generator Network, invented by Abigail See in 2017, to use as a model for summarizing action items. This choice was our first because some of the Pointer Generator’s signature features are particularly favorable to ExtrAction’s business context.</p>
+                <br>
+                <p class="mb-0">The Pointer-Generator is both an extractive and an abstractive summarization architecture. At each step in producing a summary, the model chooses between using a token from the input text or one from the vocabulary it is trained with. Experiments in the literature have shown that, more often than not, the pointer generator chooses to “point” or copy a token from the input sequence. This feature is critical to our task because the model is likely to see important tokens which are outside its known vocabulary quite often in the context of business. For example, if an action sentence says “Please send a copy of our agreement to Rowan Cassius”, chances are high that the names Rowan and Cassius are out of vocabulary (OOV). This is not a problem for the pointer generator because it can simply point to “Rowan” and then “Cassius” when producing a summary and does not need to have decent vector representations for every name.</p>
+                <br>
+                <p class="mb-0">Additionally, we made customizations to the vanilla pointer-generator described by Abigail See by using pre-trained GloVe word vectors, action and context segment embeddings and customized named entity merging and coding.</p>
+              </div>
+            </div>
+            <img class="img-fluid rounded about-heading-img mb-3 mb-lg-0" src="img/t3.jpg" alt="">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page-section about-heading">
+      <div class="container">
+        <div class="about-heading-content">
+          <div class="row">
+            <div class="col-xl-9 col-lg-10 mx-auto">
+              <div class="bg-faded text-center rounded p-5" style="margin-top:50px">
+                <h2 class="section-heading mb-4">
+                  <span class="section-heading-lower">User Interface</span>
+                </h2>
+            <div class="product-item-description d-flex mr-auto">
+              <div class="bg-faded p-5 rounded" style="height:auto;">
+                <p class="mb-0">When it comes to Extraction’s user interface, we wanted to stay true to Extraction’s primary mission of simplifying the lives of its users. As a result, our UI design prioritizes a simple and straightforward user experience and all the features we’ve decided to add were deemed necessary and irreplaceable. </p>
+                <br>
+                <p class="mb-0">The primary feature of Extraction is the generated list of action items. We wanted the main view of the extension to focus on the list of action items to make it as easy as possible for users to access this information. We wanted to let users manipulate the action items however they chose to do. Every feature we decided to include supplements this list, while not simultaneously disrupting the simplicity of the extension.</p>
+                <br>
+                <img class="img-fluid rounded about-heading-img mb-3 mb-lg-0" src="img/t4.png" alt="">
+                <br>
+                <br>
+                <p class="mb-0">We originally planned on creating a system that could pull a batch of emails at a time and automatically turn them into action items. However, gmail authentication and scraping proved to be a difficult and imprecise task, so we decided to include the text box to allow users to correct possible errors or simply paste emails into the text box and forego the scraping process if they so chose to.</p>
+                <br>
+                <p class="mb-0">Our final user interface maintains the original design concept of simplicity, while also including all the features we deemed necessary to create a functional and exportable to-do list.</p>
+              </div>
+            </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page-section about-heading">
+      <div class="container">
+        <div class="about-heading-content">
+          <div class="row">
+            <div class="col-xl-9 col-lg-10 mx-auto">
+              <div class="bg-faded text-center rounded p-5" style="margin-top:50px">
+                <h2 class="section-heading mb-4">
+                  <span class="section-heading-lower">Sources</span>
+                </h2>
+            <!-- <img class="img-fluid rounded about-heading-img mb-3 mb-lg-0" src="img/t2.jpg" alt=""> -->
+            <div class="product-item-description d-flex mr-auto">
+              <div class="bg-faded p-5 rounded" style="height:auto; margin:0 auto">
+                <ul style="text-align:left">
+                  <li><a href="https://www.cs.cmu.edu/~./enron/">Enron Email Corpus</a></li>
+                  <li><a href="https://www.aclweb.org/anthology/W18-6104/">EPA Dataset</a> for Addressee Tagging</li>
+                  <li><a href="https://github.com/ParakweetLabs/EmailIntentDataSet">Email Intent Dataset</a></li>
+                  <li><a href="https://github.com/mahnazkoupaee/WikiHow-Dataset">WikiHow Dataset</a></li>
+                </ul>
+              </div>
+            </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+<!--     <section class="page-section">
     <div class="container">
       <div class="product-item">
         <div class="product-item-title d-flex">
-          <div class="bg-faded p-5 d-flex ml-auto rounded">
+          <div class="bg-faded p-5 d-flex ml-auto rounded" style="margin-bottom:-30px; z-index: 1; position: relative;">
             <h2 class="section-heading mb-0">
-              <span class="section-heading-upper">Blended to Perfection</span>
-              <span class="section-heading-lower">Coffees &amp; Teas</span>
+              <span class="section-heading-lower">Data Architecture</span>
             </h2>
           </div>
         </div>
-        <img class="product-item-img mx-auto d-flex rounded img-fluid mb-3 mb-lg-0" src="img/products-01.jpg" alt="">
+        <img class="product-item-img mx-auto d-flex rounded img-fluid mb-3 mb-lg-0" src="img/t2.jpg" alt="">
         <div class="product-item-description d-flex mr-auto">
           <div class="bg-faded p-5 rounded">
-            <p class="mb-0">We take pride in our work, and it shows. Every time you order a beverage from us, we guarantee that it will be an experience worth having. Whether it's our world famous Venezuelan Cappuccino, a refreshing iced herbal tea, or something as simple as a cup of speciality sourced black coffee, you will be coming back for more.</p>
+            <p class="mb-0">Here's an illustration of how a message is processed from when it gets scraped to when it gets served back to the user in a To-Do list format.</p>
           </div>
         </div>
       </div>
@@ -179,12 +323,7 @@
       </div>
     </div>
   </section>
-
-  <footer class="footer text-faded text-center py-5">
-    <div class="container">
-      <p class="m-0 small">Automatic Request Summarization for Emails</p>
-    </div>
-  </footer>
+ -->
 
     <footer class="footer text-faded text-center py-5">
     <div class="container">
