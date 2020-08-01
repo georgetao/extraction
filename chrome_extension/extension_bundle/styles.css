@@ -72,6 +72,17 @@ a:hover span {
   display:block; 
 }
 
+.a {
+  display: block;
+  padding: 8px 16px;
+  text-decoration: none;
+  border-style:solid;
+  border-width:2px;
+  text-align:center;
+  font-weight:bold;
+  border-radius:5px;
+}
+
 /*a:hover {
   background-color: #FFE2C2;
   color: white;

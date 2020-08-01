@@ -49,7 +49,7 @@ function add_one_item_to_todo(result, id_counter) {
 	//TEXT GOES HERE
 	var inputText = document.createTextNode(result);
 	var header3 = document.createElement("h3");
-	var itemText = document.createElement("a");
+	var itemText = document.createElement("span");
 	var tabButton = document.createElement("a");
 	
 	tab_head_div.appendChild(header3);
@@ -58,7 +58,7 @@ function add_one_item_to_todo(result, id_counter) {
 
 	header3.className += "mb-0";
 
-	itemText.className += "text-action";
+	itemText.className += "text-action a";
 	itemText.setAttribute("contenteditable", "true");
 	itemText.setAttribute("name", "task");
 	itemText.appendChild(inputText);
