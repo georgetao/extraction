@@ -220,7 +220,7 @@ p {
   .demo-item .demo-test {
     position: relative;
     z-index: 1;
-    width: 600px;
+    width: 500px;
     height: 415px;
     margin: auto;
     overflow:hidden;

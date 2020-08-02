@@ -56,22 +56,6 @@ a {
   border-radius:5px;
 }
 
-a span {
-  display: none;
-  padding: initial;
-  text-decoration: initial;
-  border-style:initial;
-  border-width:initial;
-  text-align:initial;
-  font-weight:initial;
-  color:initial;
-  border-radius:5px;
-}
-
-a:hover span { 
-  display:block; 
-}
-
 .a {
   display: block;
   padding: 8px 16px;
@@ -88,11 +72,6 @@ a:hover span {
   color: white;
   cursor: pointer;
 }*/
-
-button {
-  /*width:30px;*/
-  display: none;
-}
 
 .circle {
   width:20px;
@@ -212,6 +191,7 @@ button {
   margin-bottom:10px; 
   margin-left:auto; 
   margin-right:auto; 
+  margin-top:-30px;
   display:block;
 }
 
@@ -225,6 +205,7 @@ button {
   height: 100%;
   display: flex;
   align-items: center;
+  margin-bottom:10px;
 }
 
 .extractButton:hover{

@@ -246,11 +246,8 @@ $(document).ready(function() {
 })
 
 document.getElementById('helpButton').addEventListener('click', function () {
-// function test () {
-	// var largeImage = document.getElementById('largeImage');
-	// var url="img/ExtrAction_Help_Guide.png";
 	window.open("img/ExtrAction_Help_Guide.png")
-}
+  }
 )
 
 // document.getElementById('clickMe').addEventListener('click', summarize);
