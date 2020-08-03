@@ -287,6 +287,10 @@ ul {
   text-align:center !important;
 }
 
+#footer-email:hover {
+  background-color: #df902a;
+}
+
 .text-primary {
   color: #e6a756 !important;
 }
