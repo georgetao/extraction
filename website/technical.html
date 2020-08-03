@@ -79,7 +79,7 @@
               <!--                 <span class="section-heading-upper">Our</span> -->
               <span class="section-heading-lower">Our Goals</span>
             </h2>
-            <p>To enable our project vision, we, the ExtrAction team, needed to build a system that is able to detect action items present in a given email, and then summarize them appropriately. We approached these two actions using two steps using two core NLP tasks: text classification and text summarization. Text classification is used to determine which sentences contain action items and then text summarization is used to make a succinct summary of each action item. </p>
+            <p>To enable our project vision, we needed to build a system that is able to detect action items present in a given email, and then summarize them appropriately. We approached these two necessary actions by framing them as two fundamental tasks of Natural Language Processing: text classification and text summarization. Text classification is used to determine which sentences contain action items and text summarization is used to make a succinct summary of each action item. </p>
             <br>
             <p class="address mb-5" style="text-align: center">
               <strong>Github</strong>
@@ -103,24 +103,24 @@
               </h2>
               <div class="product-item-description d-flex mr-auto">
                 <div class="bg-faded p-5 rounded" style="height:auto; margin-top:10px;">
-                  <p class="mb-0">Our task requires us to create both a text classifier and a text summarizer, and therefore requires two distinct datasets to train each of these models. To curate these two specialized datasets, we draw natural language data from one primary source: the Enron Email Corpus<sup>1</sup>, a dataset of approximately 500,000 naturally written emails from the Enron Corporation in the early 2000s. It is currently the largest publicly available collection of naturally written language in an organizational setting.</p>
+                  <p class="mb-0">Under the hood, Extraction uses a text classifier and a text summarizer to perform its signature function (summarizing action items). Therefore, to build Extraction, we required two distinct datasets for training the classifier and the summarizer individually. To curate these two specialized datasets, we drew natural language data from one primary source: the Enron Email Corpus<sup>1</sup>, a dataset of approximately 500,000 naturally written emails from the Enron Corporation in the early 2000s. It is currently the largest publicly available collection of naturally written language in an organizational setting.</p>
                 </div>
               </div>
               <img class="img-fluid rounded about-heading-img mb-3 mb-lg-0" src="img/t1.jpg" alt="" style="margin-top: 10px;">
               <div class="product-item-description d-flex mr-auto">
                 <div class="bg-faded p-5 rounded" style="height:auto; margin-top:0px;">
                   <h4>Action Sentence Detection Dataset:</h4>
-                  <p class="mb-0">The text classification required for ExtrAction is classifying whether or not a particular piece of text contains an action item. The piece of text serving as our unit of analysis is the sentence. It is possible for multiple distinct action items to be expressed in a single sentence and also for a single sentence’s action item to depend heavily on previous sentences. However, according to our preliminary analyses and exploration, the sentence remains the unit most likely to contain exactly one distinct action item. Therefore, we proceeded to assemble a dataset of sentences and associated 1/0 labels indicating whether there is an action item present in the sentence. For short, we refer to a sentence containing an action item as an action sentence.</p>
+                  <p class="mb-0">Extraction’s operative text classifier determines whether or not a particular segment of text contains an action item. The segment of text serving as our unit of analysis is the sentence. In other words, the text classifier is trained to evaluate whether a single sentence contains an action item.  Although It is possible for multiple distinct action items to be expressed in a single sentence (and also for a single sentence’s action item to depend heavily on previous sentences), according to our preliminary analyses and exploration, the sentence remains the unit most likely to contain exactly one distinct action item. Therefore, we curated a dataset of sentences and their associated labels (1/0) indicating whether there is an action item present in each sentence. We refer to a sentence containing an action item as an action sentence for short.</p>
                   <br>
-                  <p class="mb-0">To create this dataset, we merged disparate labeled portions of the Enron Corpus. The most important of which is the EPA dataset<sup>2</sup> for addressee tagging created by researchers at Microsoft. The dataset is a list of enron email messages containing highlighted sections which express a task which the sender asked the user to complete. We created a parser using Python to retrieve the sentence to which the highlighted task belongs as well up to 3 sentences that came before the action sentence. To balance out the positives, we pulled negative examples (non-action sentences) from Email Intent Dataset<sup>3</sup> and from Parakweet Labs the UC Berkeley Enron Email Analysis Project. </p>
+                  <p class="mb-0">To create this dataset, we merged several disparate labeled portions of the Enron Corpus. The most important of which is the EPA Dataset<sup>2</sup>  for addressee tagging created by researchers at Microsoft. The dataset is a list of Enron email messages containing highlighted strings which express tasks to be done by the recipient. We wrote a Python script to parse the EPA data and retrieve the sentence to which the highlighted task belongs as well up to 3 sentences that come before the action sentence. To balance out the action sentences (positives, 1s), we pulled non-action sentences (negatives, 0s) from the Email Intent Dataset<sup>3</sup> created by Parakweet Labs as well as the UC Berkeley Enron Email Analysis Project<sup>4</sup>. The product of merging email sentences from the various sources discussed above is the Action Sentence Detection Dataset, which we then used to train Extraction’s action sentence classifier.</p>
                   <br>
                   <br>
                   <h4>Action Item Summarization Dataset:</h4>
-                  <p class="mb-0">The next dataset we created associated an action sentence and its up to 3 sentences that preceded it with a summary of the action item. We include up to 3 preceding sentences because they tend to contain details that are important to fully understanding the action item. </p>
+                  <p class="mb-0">To train an action item summarizer, we curated a dataset which associates action sentences and their preceding sentences with summaries of the action items. We prepended up to three preceding sentences of each action sentence because these preceding sentences tend to contain details that are important to fully understanding the action item.</p>
                   <br>
-                  <p class="mb-0">To curate this dataset, members of our team together annotated approximately 4,000 action sentences with action item summaries. To minimize influence of members’ personal linguistic signatures in the summaries, we collectively adhered to a set of agreed upon guidelines when summarizing the action items. The primary principles to which the members agreed emphasized clarity, conciseness, and attractiveness (using words present in the text). </p>
+                  <p class="mb-0">To curate this dataset, members of our team summarized approximately 4,000 action sentence examples. To make the summaries as generalizable as possible and also minimize the influence of members’ personal linguistic dispositions in the summaries, we adhered to a set of guidelines when summarizing the action items. The primary guiding principles of the guidelines emphasize clarity, conciseness, and extractive-ness (using words present in the input text).</p>
                   <br>
-                  <p class="mb-0">Finally, to supplement our dataset of 4,000 instances we used the Wikihow Summarization Dataset<sup>4</sup>, consisting of article paragraphs and their 2nd person, prescriptive summaries. We use nearly 1 million instances from the WikiHow dataset for pre-training before fine-tuning the model on our own curated dataset. </p>
+                  <p class="mb-0">Finally, to supplement our dataset of 4,000 instances we used the Wikihow Dataset5, consisting of WikiHow article paragraphs and summaries for each of them. The WikiHow summaries are amenable to the task of action item summarization because these summaries, like our action item summaries, are in the imperative mood. We use nearly 1 million instances from the WikiHow dataset for pre-training before fine-tuning the model on our own curated dataset.</p>
                 </div>
               </div>
             </div>
@@ -139,6 +139,11 @@
               <h2 class="section-heading mb-4">
                 <span class="section-heading-lower">Data Architecture</span>
               </h2>
+              <div class="product-item-description d-flex mr-auto">
+                <div class="bg-faded p-5 rounded" style="height:auto;">
+                  <p class="mb-0">How does an entire email message get processed and turned into a list of action items? This process can be illustrated conceptually in the 5 steps below.</p>
+                </div>
+              </div>
               <img class="img-fluid rounded about-heading-img mb-3 mb-lg-0" src="img/t2_original.jpg" alt="">
               <div class="product-item-description d-flex mr-auto">
                 <div class="bg-faded p-5 rounded" style="height:auto;">
@@ -244,7 +249,7 @@
               <!-- <img class="img-fluid rounded about-heading-img mb-3 mb-lg-0" src="img/t2.jpg" alt=""> -->
               <div class="product-item-description d-flex mr-auto">
                 <div class="bg-faded p-5 rounded" style="height:auto; margin:0 auto">
-                  <ol style="text-align:left">
+                  <ol>
                     <li><a href="https://www.cs.cmu.edu/~./enron/">Enron Email Corpus</a></li>
                     <li><a href="https://www.aclweb.org/anthology/W18-6104/">EPA Dataset</a> for Addressee Tagging</li>
                     <li><a href="https://github.com/ParakweetLabs/EmailIntentDataSet">Email Intent Dataset</a></li>
@@ -259,72 +264,9 @@
     </div>
   </section>
 
-  <!--     <section class="page-section">
-    <div class="container">
-      <div class="product-item">
-        <div class="product-item-title d-flex">
-          <div class="bg-faded p-5 d-flex ml-auto rounded" style="margin-bottom:-30px; z-index: 1; position: relative;">
-            <h2 class="section-heading mb-0">
-              <span class="section-heading-lower">Data Architecture</span>
-            </h2>
-          </div>
-        </div>
-        <img class="product-item-img mx-auto d-flex rounded img-fluid mb-3 mb-lg-0" src="img/t2.jpg" alt="">
-        <div class="product-item-description d-flex mr-auto">
-          <div class="bg-faded p-5 rounded">
-            <p class="mb-0">Here's an illustration of how a message is processed from when it gets scraped to when it gets served back to the user in a To-Do list format.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="page-section">
-    <div class="container">
-      <div class="product-item">
-        <div class="product-item-title d-flex">
-          <div class="bg-faded p-5 d-flex mr-auto rounded">
-            <h2 class="section-heading mb-0">
-              <span class="section-heading-upper">Delicious Treats, Good Eats</span>
-              <span class="section-heading-lower">Bakery &amp; Kitchen</span>
-            </h2>
-          </div>
-        </div>
-        <img class="product-item-img mx-auto d-flex rounded img-fluid mb-3 mb-lg-0" src="img/products-02.jpg" alt="">
-        <div class="product-item-description d-flex ml-auto">
-          <div class="bg-faded p-5 rounded">
-            <p class="mb-0">Our seasonal menu features delicious snacks, baked goods, and even full meals perfect for breakfast or lunchtime. We source our ingredients from local, oragnic farms whenever possible, alongside premium vendors for specialty goods.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="page-section">
-    <div class="container">
-      <div class="product-item">
-        <div class="product-item-title d-flex">
-          <div class="bg-faded p-5 d-flex ml-auto rounded">
-            <h2 class="section-heading mb-0">
-              <span class="section-heading-upper">From Around the World</span>
-              <span class="section-heading-lower">Bulk Speciality Blends</span>
-            </h2>
-          </div>
-        </div>
-        <img class="product-item-img mx-auto d-flex rounded img-fluid mb-3 mb-lg-0" src="img/products-03.jpg" alt="">
-        <div class="product-item-description d-flex mr-auto">
-          <div class="bg-faded p-5 rounded">
-            <p class="mb-0">Travelling the world for the very best quality coffee is something take pride in. When you visit us, you'll always find new blends from around the world, mainly from regions in Central and South America. We sell our blends in smaller to large bulk quantities. Please visit us in person for more details.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
- -->
-
   <footer class="footer text-faded text-center py-5">
     <div class="container">
-      <!-- <p class="m-0 small">Automatic Request Summarization for Emails</p> -->
+      <p class="m-0 small" id="footer">Have questions, comments, or ideas for us? Contact us at <span title="Left-click to copy address." onclick="copy(this)">extractionitem@gmail.com</span></p>
     </div>
   </footer>
 

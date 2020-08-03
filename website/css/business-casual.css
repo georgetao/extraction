@@ -22,9 +22,24 @@ h6 {
   font-family: "Raleway";
 }
 
+
+
 p {
   line-height: 1.75;
   text-align: justify;
+}
+
+ol {
+  height:auto; 
+  margin:0 auto;
+  text-align:left;
+}
+
+ul {
+  height:auto; 
+  margin:auto;
+  text-align:left;
+  display:inline-table;
 }
 
 .text-faded {
@@ -265,7 +280,11 @@ p {
 
 .footer {
   background-color: #585858;
-  /*background-color: rgba(47, 23, 15, 0.9);*/
+}
+
+#footer {
+  color:white;
+  text-align:center !important;
 }
 
 .text-primary {
