@@ -70,13 +70,12 @@
     </div>
   </section>
 
-  <section class="page-section cta">
+  <section class="page-section cta" id="goals">
     <div class="container">
       <div class="row">
         <div class="col-xl-9 mx-auto">
           <div class="cta-inner text-center rounded" style="background-color: rgba(255, 255, 255, 1);height:425px;">
             <h2 class="section-heading mb-5">
-              <!--                 <span class="section-heading-upper">Our</span> -->
               <span class="section-heading-lower">Our Goals</span>
             </h2>
             <p>To enable our project vision, we needed to build a system that is able to detect action items present in a given email, and then summarize them appropriately. We approached these two necessary actions by framing them as two fundamental tasks of Natural Language Processing: text classification and text summarization. Text classification is used to determine which sentences contain action items and text summarization is used to make a succinct summary of each action item. </p>
@@ -92,7 +91,20 @@
     </div>
   </section>
 
-  <section class="page-section about-heading">
+  <nav class="section-nav">
+    <ul>
+      <h5><u>Contents</u></h5>
+      <li><a href="#goals">Our Goals</a></li>
+      <li><a href="#data">The Data</a></li>
+      <li><a href="#architecture">Architecture</a></li>
+      <li><a href="#classification_model">Classification</a></li>
+      <li><a href="#summarization_model">Summarization</a></li>
+      <li><a href="#user_interface">User Interface</a></li>
+      <li><a href="#sources">Sources</a></li>
+    </ul>
+  </nav>
+
+  <section class="page-section about-heading" id="data">
     <div class="container">
       <div class="about-heading-content">
         <div class="row">
@@ -103,7 +115,7 @@
               </h2>
               <div class="product-item-description d-flex mr-auto">
                 <div class="bg-faded p-5 rounded" style="height:auto; margin-top:10px;">
-                  <p class="mb-0">Under the hood, Extraction uses a text classifier and a text summarizer to perform its signature function (summarizing action items). Therefore, to build Extraction, we required two distinct datasets for training the classifier and the summarizer individually. To curate these two specialized datasets, we drew natural language data from one primary source: the Enron Email Corpus<sup>1</sup>, a dataset of approximately 500,000 naturally written emails from the Enron Corporation in the early 2000s. It is currently the largest publicly available collection of naturally written language in an organizational setting.</p>
+                  <p class="mb-0">Under the hood, Extraction uses a text classifier and a text summarizer to perform its signature function (summarizing action items). Therefore, to build Extraction, we required two distinct datasets for training the classifier and the summarizer individually. To curate these two specialized datasets, we drew natural language data from one primary source: the Enron Email Corpus<a href="#sources"><sup>1</sup></a>, a dataset of approximately 500,000 naturally written emails from the Enron Corporation in the early 2000s. It is currently the largest publicly available collection of naturally written language in an organizational setting.</p>
                 </div>
               </div>
               <img class="img-fluid rounded about-heading-img mb-3 mb-lg-0" src="img/t1.jpg" alt="" style="margin-top: 10px;">
@@ -112,7 +124,7 @@
                   <h4>Action Sentence Detection Dataset</h4>
                   <p class="mb-0">Extraction’s operative text classifier determines whether or not a particular segment of text contains an action item. The segment of text serving as our unit of analysis is the sentence. In other words, the text classifier is trained to evaluate whether a single sentence contains an action item.  Although It is possible for multiple distinct action items to be expressed in a single sentence (and also for a single sentence’s action item to depend heavily on previous sentences), according to our preliminary analyses and exploration, the sentence remains the unit most likely to contain exactly one distinct action item. Therefore, we curated a dataset of sentences and their associated labels (1/0) indicating whether there is an action item present in each sentence. We refer to a sentence containing an action item as an action sentence for short.</p>
                   <br>
-                  <p class="mb-0">To create this dataset, we merged several disparate labeled portions of the Enron Corpus. The most important of which is the EPA Dataset<sup>2</sup>  for addressee tagging created by researchers at Microsoft. The dataset is a list of Enron email messages containing highlighted strings which express tasks to be done by the recipient. We wrote a Python script to parse the EPA data and retrieve the sentence to which the highlighted task belongs as well up to 3 sentences that come before the action sentence. To balance out the action sentences (positives, 1s), we pulled non-action sentences (negatives, 0s) from the Email Intent Dataset<sup>3</sup> created by Parakweet Labs as well as the UC Berkeley Enron Email Analysis Project<sup>4</sup>. The product of merging email sentences from the various sources discussed above is the Action Sentence Detection Dataset, which we then used to train Extraction’s action sentence classifier.</p>
+                  <p class="mb-0">To create this dataset, we merged several disparate labeled portions of the Enron Corpus. The most important of which is the EPA Dataset<a href="#sources"><sup>2</sup></a> for addressee tagging created by researchers at Microsoft. The dataset is a list of Enron email messages containing highlighted strings which express tasks to be done by the recipient. We wrote a Python script to parse the EPA data and retrieve the sentence to which the highlighted task belongs as well up to 3 sentences that come before the action sentence. To balance out the action sentences (positives, 1s), we pulled non-action sentences (negatives, 0s) from the Email Intent Dataset<a href="#sources"><sup>3</sup></a> created by Parakweet Labs as well as the UC Berkeley Enron Email Analysis Project<a href="#sources"><sup>4</sup></a>. The product of merging email sentences from the various sources discussed above is the Action Sentence Detection Dataset, which we then used to train Extraction’s action sentence classifier.</p>
                   <br>
                   <br>
                   <h4>Action Item Summarization Dataset</h4>
@@ -120,7 +132,7 @@
                   <br>
                   <p class="mb-0">To curate this dataset, members of our team summarized approximately 4,000 action sentence examples. To make the summaries as generalizable as possible and also minimize the influence of members’ personal linguistic dispositions in the summaries, we adhered to a set of guidelines when summarizing the action items. The primary guiding principles of the guidelines emphasize clarity, conciseness, and extractive-ness (using words present in the input text).</p>
                   <br>
-                  <p class="mb-0">Finally, to supplement our dataset of 4,000 instances we used the Wikihow Dataset5, consisting of WikiHow article paragraphs and summaries for each of them. The WikiHow summaries are amenable to the task of action item summarization because these summaries, like our action item summaries, are in the imperative mood. We use nearly 1 million instances from the WikiHow dataset for pre-training before fine-tuning the model on our own curated dataset.</p>
+                  <p class="mb-0">Finally, to supplement our dataset of 4,000 instances we used the Wikihow Dataset<a href="#sources"><sup>5</sup></a>, consisting of WikiHow article paragraphs and summaries for each of them. The WikiHow summaries are amenable to the task of action item summarization because these summaries, like our action item summaries, are in the imperative mood. We use nearly 1 million instances from the WikiHow dataset for pre-training before fine-tuning the model on our own curated dataset.</p>
                 </div>
               </div>
             </div>
@@ -130,7 +142,7 @@
     </div>
   </section>
 
-  <section class="page-section about-heading">
+  <section class="page-section about-heading" id="architecture">
     <div class="container">
       <div class="about-heading-content">
         <div class="row">
@@ -157,7 +169,7 @@
     </div>
   </section>
 
-  <section class="page-section about-heading">
+  <section class="page-section about-heading" id="classification_model">
     <div class="container">
       <div class="about-heading-content">
         <div class="row">
@@ -187,7 +199,7 @@
     </div>
   </section>
 
-  <section class="page-section about-heading">
+  <section class="page-section about-heading" id="summarization_model">
     <div class="container">
       <div class="about-heading-content">
         <div class="row">
@@ -198,7 +210,7 @@
               </h2>
               <div class="product-item-description d-flex mr-auto">
                 <div class="bg-faded p-5 rounded" style="height:auto;">
-                  <p class="mb-0">After considering both performance and key properties of several state-of-the-art summarization architectures, we settled on using a Pointer-Generator Network<sup>6</sup>, invented by Abigail See in 2017, to use as a model for summarizing action items. We made this choice because some of the Pointer Generator’s signature properties are particularly favorable to the task of summarizing action items for business professionals.</p>
+                  <p class="mb-0">After considering both performance and key properties of several state-of-the-art summarization architectures, we settled on using a Pointer-Generator Network<a href="#sources"><sup>6</sup></a>, invented by Abigail See in 2017, to use as a model for summarizing action items. We made this choice because some of the Pointer Generator’s signature properties are particularly favorable to the task of summarizing action items for business professionals.</p>
                   <br>
                   <p class="mb-0">The Pointer-Generator is both an extractive and an abstractive summarization architecture. When producing a single token as part of a summary, the model chooses between using a token from the input text and using one from the vocabulary it was trained with. Experiments in the literature have shown that, more often than not, the pointer generator chooses to “point” to, or copy, a token from the input sequence. This feature is critical to our task because business email messages are likely to contain important tokens, such as names and emails, which do not occur in the vocabulary used during training. </p>
                   <br>
@@ -227,7 +239,7 @@
     </div>
   </section>
 
-  <section class="page-section about-heading">
+  <section class="page-section about-heading" id="user_interface">
     <div class="container">
       <div class="about-heading-content">
         <div class="row">
@@ -270,7 +282,7 @@
     </div>
   </section>
 
-  <section class="page-section about-heading">
+  <section class="page-section about-heading" id="sources">
     <div class="container">
       <div class="about-heading-content">
         <div class="row">
@@ -283,12 +295,12 @@
               <div class="product-item-description d-flex mr-auto">
                 <div class="bg-faded p-5 rounded" style="height:auto; margin:0 auto">
                   <ol>
-                    <li><a href="https://www.cs.cmu.edu/~./enron/">Enron Email Corpus</a></li>
-                    <li><a href="https://www.aclweb.org/anthology/W18-6104/">EPA Dataset</a> for Addressee Tagging</li>
-                    <li><a href="https://github.com/ParakweetLabs/EmailIntentDataSet">Email Intent Dataset</a></li>
-                    <li><a href="https://bailando.berkeley.edu/enron_email.html">Enron Email Analysis Project</a></li>
-                    <li><a href="https://github.com/mahnazkoupaee/WikiHow-Dataset">WikiHow Dataset</a></li>
-                    <li><a href="https://arxiv.org/abs/1704.04368">Pointer Generator</a></li>
+                    <li><a href="https://www.cs.cmu.edu/~./enron/" target="_blank">Enron Email Corpus</a></li>
+                    <li><a href="https://www.aclweb.org/anthology/W18-6104/" target="_blank">EPA Dataset</a> for Addressee Tagging</li>
+                    <li><a href="https://github.com/ParakweetLabs/EmailIntentDataSet" target="_blank">Email Intent Dataset</a></li>
+                    <li><a href="https://bailando.berkeley.edu/enron_email.html" target="_blank">Enron Email Analysis Project</a></li>
+                    <li><a href="https://github.com/mahnazkoupaee/WikiHow-Dataset" target="_blank">WikiHow Dataset</a></li>
+                    <li><a href="https://arxiv.org/abs/1704.04368" target="_blank">Pointer Generator</a></li>
                   </ol>
                 </div>
               </div>

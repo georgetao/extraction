@@ -3,10 +3,12 @@
  * Copyright 2013-2019 Start Bootstrap
  * Licensed under MIT (https://github.com/BlackrockDigital/startbootstrap-business-casual/blob/master/LICENSE)
  */
+ html{
+  scroll-behavior: smooth;
+ }
 
 body {
   font-family: "Lora";
-  /*background-image: linear-gradient(rgba(47, 23, 15, 0.65), rgba(47, 23, 15, 0.65)), url("../img/bg.jpg");*/
   background-image: linear-gradient(#cbdce2, #cbdce2), url("../img/bg.jpg"); /*light maroon color*/
   background-attachment: fixed;
   background-position: center;
@@ -105,8 +107,7 @@ ul {
 }
 
 #mainNav {
-  /*background-color: rgba(47, 23, 15, 0.9);*/
-  background-color: #585858; /*dark maroon*/
+  background-color: #585858;
   font-family: "Raleway";
 }
 
@@ -177,14 +178,12 @@ ul {
   padding-top: 5rem;
   padding-bottom: 5rem;
   background-color: #ffe0c2;
-  /*background-color: rgba(230, 167, 86, 0.9);*/
 }
 
 .cta .cta-inner {
   position: relative;
   padding: 3rem;
   margin: 0.5rem;
-  /*background-color: rgba(255, 255, 255, 0.85);*/
 }
 
 .cta .cta-inner:before {
@@ -239,9 +238,6 @@ ul {
     height: 415px;
     margin: auto;
     overflow:hidden;
-    /*z-index:2;*/
-/*    margin-top:-400px;
-    margin-left:390px;*/
   }
   .product-item .product-item-description {
     position: relative;
@@ -393,4 +389,42 @@ ul {
 .tech_img {
   width: 1800px;
   margin-top: -60px;
+}
+
+/* Sidebar Navigation */
+main > nav {
+  position: sticky;
+  top: 2rem;
+  align-self: start;
+}
+
+.section-nav {
+    top: 250px;
+    position: sticky;
+    float:right;
+    margin-top: 2rem;
+    background_color:#fff;
+}
+
+.section-nav a {
+    text-decoration: none;
+    display: block;
+    padding: .125rem 0;
+    color: #000;
+    transition: all 50ms ease-in-out; /* 💡 This small transition makes setting of the active state smooth */
+}
+
+.section-nav a:hover,
+.section-nav a:focus {
+    color: #666;
+}
+
+.section-nav ul {
+  font-family:Raleway;
+  text-align: right;
+  padding-right:5px;
+  width:150px;
+  list-style-type:none;
+  background-color:#eee;
+  border-radius:5px;
 }
