@@ -54,6 +54,13 @@ a {
   font-weight:bold;
   color:white;
   border-radius:5px;
+  background-color: #E0E0E0;
+}
+
+a:hover{
+  background-color:#FFE2C2;
+  color: white;
+  cursor: pointer;
 }
 
 .a {
@@ -67,20 +74,18 @@ a {
   border-radius:5px;
 }
 
-/*a:hover {
-  background-color: #FFE2C2;
-  color: white;
-  cursor: pointer;
-}*/
+#helpButton {
+  background-color: initial;
+}
 
 .circle {
-  width:20px;
-  height: 20px;
+  width:25px;
+  height: 25px;
   border-radius:50%;
   font-size:13px;
   font-style: bold;
   background-color: #E0E0E0;
-  line-height: 20px;
+  line-height: 24px;
   text-align: center;
   line-align: center;
   vertical-align: text-top;
