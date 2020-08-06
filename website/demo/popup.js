@@ -151,11 +151,11 @@ function summarize(email_text) {
 	  }
 	}
 
-	var cloud_fn_url = 'https://us-central1-sigma-smile-251401.cloudfunctions.net/classify_summarize'
+	var cloud_fn_url = "https://us-west3-extraction-285622.cloudfunctions.net/classifier"
 
 	// console.log(cloud_fn_url);
 
-	const proxyurl = "https://cors-anywhere.herokuapp.com/";
+	const proxyurl = "https://still-lake-34462.herokuapp.com/";
 
 	return fetch(proxyurl + cloud_fn_url, {
 	    method: 'post',
@@ -168,20 +168,10 @@ function summarize(email_text) {
 	  .then(response => response.json())
 	  .then(function (data) {
 	  	var results = [];
-	  	console.log("Checkpoint")
+	  	// console.log("Checkpoint")
 	    for (i in data) {
 	    	results.push(data[i])
 	    }
-	 //    reqs = data["requests"]
-	 //    certs = data["certainty"]
-
-		// for (var i=0; i < reqs.length; i++) {
-		// 	var sentence = reqs[i]
-		// 	var certainty = certs[i]
-		// 	document.getElementById("answer").value += sentence + '\r\n' + '\r\n';
-
-		// 	results.push(sentence);
-		// }
 	    return results;
 	  })
 	  .then(function(data) {
