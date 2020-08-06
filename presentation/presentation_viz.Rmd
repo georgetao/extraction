@@ -114,8 +114,14 @@ ggplot(aes(x=percentage, y=portion)) +
 
 
 ```{r}
-survey = read_csv('ExtrAction Interest Survey')
+survey = read.csv('ExtrAction Interest Survey.csv')
 ```
+
+
+```{r}
+survey
+```
+
 
 
 
