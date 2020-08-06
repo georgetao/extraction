@@ -7,13 +7,13 @@ document.getElementById("extractFromEmail").addEventListener("click", () => {
         " " +
         document.body.getElementsByTagName("P")[i].textContent;
     }
-    var sender = document.body.getElementsByClassName("go")[0].innerText;
-    var sender_name = document.body.getElementsByClassName("gD")[0].innerText;
-    console.log(sender);
-    console.log(sender_name);
-    alert("sender_name: " + sender_name + " email: " + sender);
-    console.log("p elements text joined together");
-    console.log(full_email_text);
+    // var sender = document.body.getElementsByClassName("go")[0].innerText;
+    // var sender_name = document.body.getElementsByClassName("gD")[0].innerText;
+    // console.log(sender);
+    // console.log(sender_name);
+    // alert("sender_name: " + sender_name + " email: " + sender);
+    // console.log("p elements text joined together");
+    // console.log(full_email_text);
     if (full_email_text == "") {
       console.log("need to look inside divs bc no text in p elements");
       var date_regex = /[A-Z][a-z]{0,2} [0-9]{1,2}, [0-9]*,* [0-9]{1,2}:[0-9]{1,2} [A-Z]{2}/;

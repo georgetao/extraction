@@ -132,11 +132,14 @@ function summarize(email_text) {
   }
 
   var cloud_fn_url =
-    "https://us-central1-sigma-smile-251401.cloudfunctions.net/classify_summarize";
+      "https://us-west3-extraction-285622.cloudfunctions.net/classifier";
 
   console.log(cloud_fn_url);
 
-  return fetch(cloud_fn_url, {
+
+  const proxyurl = "https://cors-anywhere.herokuapp.com/";
+
+  return fetch(proxyurl + cloud_fn_url, {
     method: "post",
     headers: {
       Accept: "application/json",
